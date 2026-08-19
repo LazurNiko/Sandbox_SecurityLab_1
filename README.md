@@ -2,8 +2,8 @@
 flowchart TD
     subgraph HOST["Host-machine"]
         DC01["<b>DC01</b><br/>Domain Controller<br/>corpnet.local"]
-        NIC["Фізичний адаптер хоста<br/>Wi-Fi / Ethernet"]
-        subgraph VMNET["VMnet2 — Host-only мережа"]
+        NIC["Physical host adapter<br/>Wi-Fi / Ethernet"]
+        subgraph VMNET["VMnet2 — Host-only Network"]
             KALI["<b>KALI-ATK</b><br/>Attacker<br/>Kali Linux"]
             VICTIM["<b>VICTIM</b><br/>Target<br/>Metasploitable2"]
             SENSOR["<b>SENSOR</b><br/>Montoring<br/>Ubuntu Server (Zeek + Suricata)"]
