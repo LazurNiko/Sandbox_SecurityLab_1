@@ -1,19 +1,19 @@
 ```mermaid
 flowchart TD
-    subgraph HOST["Хост-машина"]
-        DC01["<b>DC01</b><br/>Контролер домену<br/>corpnet.local"]
+    subgraph HOST["Host-machine"]
+        DC01["<b>DC01</b><br/>Domain Controller<br/>corpnet.local"]
         NIC["Фізичний адаптер хоста<br/>Wi-Fi / Ethernet"]
         subgraph VMNET["VMnet2 — Host-only мережа"]
-            KALI["<b>KALI-ATK</b><br/>Атакер<br/>Kali Linux"]
-            VICTIM["<b>VICTIM</b><br/>Ціль<br/>Metasploitable2"]
-            SENSOR["<b>SENSOR</b><br/>Моніторинг<br/>Zeek + Suricata"]
+            KALI["<b>KALI-ATK</b><br/>Attacker<br/>Kali Linux"]
+            VICTIM["<b>VICTIM</b><br/>Target<br/>Metasploitable2"]
+            SENSOR["<b>SENSOR</b><br/>Montoring<br/>Ubuntu Server (Zeek + Suricata)"]
             DC01 --- KALI
             KALI --- SENSOR
             SENSOR --- VICTIM
             VICTIM --- DC01
         end
     end
-    NIC -->|"тільки для хоста"| WAN["Домашня мережа / Інтернет"]
+    NIC -->|"host-only"| WAN["Home Network / Internet"]
 
     style DC01 fill:#E6F1FB,stroke:#185FA5,color:#0C447C
     style KALI fill:#FAECE7,stroke:#993C1D,color:#712B13
