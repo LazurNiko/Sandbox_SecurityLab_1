@@ -2,12 +2,12 @@
 flowchart TD
     subgraph HOST["Host-machine"]
         DC01["<b>DC01</b><br/>Windows Server 
-        (Domain Controller)<br/>corpnet.local"]
+        (Domain Controller)<br/>corpnet.local <br/>192.168.100.1"]
         NIC["Physical host adapter<br/>Wi-Fi / Ethernet"]
         subgraph VMNET["VMnet2 — Host-only Network"]
-            KALI["<b>KALI-ATK</b><br/>Attacker<br/>Kali Linux"]
-            VICTIM["<b>VICTIM</b><br/>Target<br/>Metasploitable2"]
-            SENSOR["<b>SENSOR</b><br/>Montoring<br/>Ubuntu Server (Zeek + Suricata)"]
+            KALI["<b>KALI-ATK</b><br/>Attacker<br/>Kali Linux <br/>192.168.100.20"]
+            VICTIM["<b>VICTIM</b><br/>Target<br/>Metasploitable2 <br/>192.168.100.30"]
+            SENSOR["<b>SENSOR</b><br/>Montoring<br/>Ubuntu Server (Zeek + Suricata) <br/>192.168.100.10"]
             DC01 --- KALI
             KALI --- SENSOR
             SENSOR --- VICTIM
