@@ -21,6 +21,10 @@ unzip Procdump.zip -d procdump/
 ```bash
 which nmap hashcat nxc smbclient impacket-GetUserSPNs impacket-GetNPUsers impacket-secresdump impacket-psexec kerbrute bloodhound-python pypykatz
 ``` 
+### Install Portable OpenCL
+```bash
+sudo apt install pocl-opencl-icd -y
+```
 ### Install ntpdate for sync time with DC01
 ```bash
 sudo apt install ntpsec-ntpdate
