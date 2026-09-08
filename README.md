@@ -10,7 +10,7 @@ flowchart LR
 
         SENSOR["SENSOR\n192.168.100.40\nUbuntu 22.04\nSuricata · Zeek\nWazuh · TheHive"]
 
-        VICTIM["VICTIM\n192.168.100.30\nMetasploitable2\nTarget Host"]
+        VICTIM["VICTIM\n192.168.100.100\nWIN_WORKSTATION\nTarget Host"]
 
     end
 
@@ -28,9 +28,9 @@ flowchart LR
 | DC01 | Windows Server 2019 |192.168.100.1  | Domain Controller (corpnet.local) |
 | KALI-ATK | Kali Linux 2026 | 192.168.100.20 | Attacker | 
 | SENSOR | Ubuntu 22.04 | 192.168.100.10 | IDS / SIEM / IR Platform |
-| VICTIM | Metasploitable2 | 192.168.100.30 | Target Host
+| VICTIM | WIN_WORKSTATION | 192.168.100.100 | Target Host (Local Admin)
 
-Host machine: *ThinkPad T440s · Intel i7-4600U · 16GB DDR3L ·* VMware Workstation Domain: corpnet.local · Network: VMnet2 (host-only, fully isolated, no NAT)
+Host machine: *ThinkPad with Windows installed ·* VMware Workstation Domain: corpnet.local · Network: VMnet2 (host-only, fully isolated, no NAT)
 
 
 ## Lab Contents
