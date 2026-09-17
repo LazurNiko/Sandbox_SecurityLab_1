@@ -53,7 +53,7 @@ Before writing rules blind, capture the actual attack traffic once, so rules are
 
 Step 1 — Start a raw capture on SENSOR
 ```bash
-sudo tcpdump -i <interface> -w /home/user/block2_capture.pcap host 192.168.100.1
+sudo tcpdump -i ens33 -w /home/sensor/block2_capture.pcap host 192.168.100.1
 ```
 Step 2 — On KALI-ATK, run each attack in sequence (from block1-attacks/four-attack-chain.md), while the capture is running.
 
