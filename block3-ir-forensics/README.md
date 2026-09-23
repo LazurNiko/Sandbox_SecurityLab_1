@@ -95,22 +95,19 @@ sudo bash wazuh-install.sh -a
 ```
 #### Step 2 — Install and register agents on DC01 and VICTIM
 ```powershell
-# On DC01 (PowerShell, admin)
+# Both On DC01 and WORKSTATION (PowerShell, administrator, )
 
 Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-4.9.0-1.msi -OutFile wazuh-agent.msi
 
 msiexec.exe /i wazuh-agent.msi /q WAZUH_MANAGER="192.168.100.40"
 
 NET START WazuhSvc
-```
-```bash
-# On VICTIM (Linux)
 
-curl -o wazuh-agent.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.9.0-1_amd64.deb \
+# optionaly if linux is victim commands below
 
-  && WAZUH_MANAGER="192.168.100.40" dpkg -i ./wazuh-agent.deb
+# curl -o wazuh-agent.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/# wazuh-agent_4.9.0-1_amd64.deb && WAZUH_MANAGER="192.168.100.40" dpkg -i ./wazuh-agent.deb
 
-sudo systemctl enable wazuh-agent --now
+# sudo systemctl enable wazuh-agent --now
 ```
 
 #### Step 3 — Enable Windows Security Log forwarding on DC01
