@@ -74,74 +74,70 @@ This pcap becomes the regression-test artifact — every rule you write gets val
 
 3. Writing Detection Rules
 Create a dedicated rule file:
-
+```bash
 sudo nano /etc/suricata/rules/block2-ad-attacks.rules
+```
 3.1 Kerberoasting — RC4 TGS-REQ Detection
 Logic: Kerberoasting tools (impacket, Rubeus) request TGS tickets using RC4 (etype 23) encryption because RC4 hashes are far easier to crack than AES. Modern AD environments default to AES-256; a burst of RC4 TGS-REQs is anomalous.
-
-alert kerberos any any -> $DC_SERVERS 88 (msg:"AD Possible Kerberoasting - RC4 TGS-REQ"; \
-
-  kerberos.msgtype:12; \
-
-  kerberos.encryption:0x17; \
-
-  threshold: type threshold, track by_src, count 3, seconds 60; \
-
-  classtype:attempted-recon; sid:1000001; rev:1;)
-
+```bash
+#/etc/suricata/rules/block2-ad-attacks.rules
+alert krb5 any any -> $DC_SERVERS 88 (msg:"AD Possible Kerberoasting - RC4 TGS-REQ"; krb5_msg_type:12; krb5.ticket_encryption:rc4-hmac; threshold: type threshold, track by_src, count 3, seconds 60; classtype:attempted-recon; sid:1000001; rev:1;)
+```
 kerberos.msgtype:12 — matches TGS-REQ specifically.
 kerberos.encryption:0x17 — etype 23 (RC4-HMAC) in hex.
 threshold — fires only after 3+ RC4 TGS-REQs from the same source within 60s, reducing noise from legacy-but-legitimate services.
+
 3.2 AS-REP Roasting — Missing Pre-Authentication
 Logic: a normal AS-REQ includes a PA-ENC-TIMESTAMP pre-auth field. AS-REP Roasting targets accounts with DONT_REQ_PREAUTH set, so the AS-REQ from the attacker's tool lacks this field entirely.
-
-alert kerberos any any -> $DC_SERVERS 88 (msg:"AD Possible AS-REP Roasting - AS-REQ without PA-DATA"; \
-
-  kerberos.msgtype:10; \
-
-  kerberos.preauth:0; \
-
-  threshold: type threshold, track by_src, count 1, seconds 10; \
-
-  classtype:attempted-recon; sid:1000002; rev:1;)
-
-kerberos.msgtype:10 — AS-REQ.
-kerberos.preauth:0 — no pre-authentication data present (Suricata's Kerberos keyword; confirm exact keyword syntax against your Suricata version's kerberos app-layer parser docs, as field naming has changed across releases).
+```text
+Suricata's krb5 keyword set doesn't expose PA-DATA presence, so AS-REP roasting detection at the network layer isn't currently feasible via native keywords — falls back to Windows Event ID 4768 without pre-auth, or a custom Lua/byte_test on raw ASN.1
+```
 3.3 DCSync — Replication Call From a Non-DC Host
 Logic: IDL_DRSGetNCChanges (part of MS-DRSR / DRSUAPI) should only ever be called by a genuine Domain Controller replicating with another DC. A call originating from KALI-ATK's IP is definitive, not probabilistic.
-
-alert tcp any any -> $DC_SERVERS 135 (msg:"AD Possible DCSync - DRSUAPI GetNCChanges from non-DC host"; \
-
-  flow:to_server,established; \
-
-  dce_iface:e3514235-4b06-11d1-ab04-00c04fc2dcd2; \
-
-  dce_opnum:3; \
-
-  classtype:attempted-admin; sid:1000003; rev:1;)
-
+```bash
+#/etc/suricata/rules/block2-ad-attacks.rules
+alert tcp any any -> $DC_SERVERS 135 (msg:"AD Possible DCSync - DRSUAPI GetNCChanges from non-DC host"; flow:to_server,established; dce_iface:e3514235-4b06-11d1-ab04-00c04fc2dcd2; dce_opnum:3; classtype:attempted-admin; sid:1000003; rev:1;)
+```
 dce_iface: e3514235-4b06-11d1-ab04-00c04fc2dcd2 — the DRSUAPI interface UUID.
 dce_opnum: 3 — opnum for IDL_DRSGetNCChanges.
 No $DC_SERVERS as source means this rule as written watches inbound calls to the DC — combine with a second rule or a PCAP/BloodHound cross-check confirming the source is NOT another element of $DC_SERVERS, since DC-to-DC replication is legitimate and would otherwise false-positive if you have >1 DC in scope.
 
+So, the final rule file is:
+```bash
+#/etc/suricata/rules/block2-ad-attacks.rules
+alert krb5 any any -> $DC_SERVERS 88 (msg:"AD Possible Kerberoasting - RC4 TGS-REQ"; krb5_msg_type:12; krb5.ticket_encryption:rc4-hmac; threshold: type threshold, track by_src, count 3, seconds 60; classtype:attempted-recon; sid:1000001; rev:1;)
+
+alert tcp any any -> $DC_SERVERS 135 (msg:"AD Possible DCSync - DRSUAPI GetNCChanges from non-DC host"; flow:to_server,established; dce_iface:e3514235-4b06-11d1-ab04-00c04fc2dcd2; dce_opnum:3; classtype:attempted-admin; sid:1000003; rev:1;)
+```
 
 4. Load Rules Into Suricata
 Step 1 — reference the rule file in suricata.yaml
-
+```bash
+#/etc/suricata/suricata.yaml
 rule-files:
 
   - block2-ad-attacks.rules
+```
+Step 2 - Confirm enabling kerberos protocol in /etc/suricata/suricata.yaml
 
+```bash
+#/etc/suricata/suricata.yaml
+app-layer:
+  protocols:
+    krb5:
+      enabled: yes
+```
 Step 2 — validate rule syntax
-
+```bash
 sudo suricata -T -c /etc/suricata/suricata.yaml -v
-
-Look for Configuration provided was successfully loaded — any syntax error in the .rules file will show up here before you ever run live.
+```
+Look for Configuration provided was successfully loaded — any syntax error in the .rules file will show up here before we ever run live.
 
 Step 3 — run Suricata live
 
+```bash
 sudo suricata -c /etc/suricata/suricata.yaml -i <interface>
-
+```
 
 5. Validation — Replay the Captured Attack Traffic
 Rather than re-running the live attacks every time, replay the pcap from Section 2 to regression-test rule changes quickly.
