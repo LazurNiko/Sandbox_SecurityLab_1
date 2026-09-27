@@ -78,14 +78,20 @@ Create a dedicated rule file:
 sudo nano /etc/suricata/rules/block2-ad-attacks.rules
 ```
 3.1 Kerberoasting — RC4 TGS-REQ Detection
-Logic: Kerberoasting tools (impacket, Rubeus) request TGS tickets using RC4 (etype 23) encryption because RC4 hashes are far easier to crack than AES. Modern AD environments default to AES-256; a burst of RC4 TGS-REQs is anomalous.
+Logic: Kerberoasting tools (impacket, Rubeus) request TGS tickets using RC4 (etype 23) encryption because RC4 hashes are far easier to crack than AES. Burst of RC4 TGS-REQs is anomalous.
 ```bash
 #/etc/suricata/rules/block2-ad-attacks.rules
-alert krb5 any any -> $DC_SERVERS 88 (msg:"AD Possible Kerberoasting - RC4 TGS-REQ"; krb5_msg_type:12; krb5.ticket_encryption:rc4-hmac; threshold: type threshold, track by_src, count 3, seconds 60; classtype:attempted-recon; sid:1000001; rev:1;)
+alert krb5 any any -> $DC_SERVERS 88 (msg:"AD Kerberos Weak Encryption - RC4 Ticket Requested"; krb5_msg_type:12; krb5.ticket_encryption:rc4-hmac; threshold: type threshold, track by_src, count 3, seconds 60; classtype:attempted-recon; sid:1000001; rev:1;)
 ```
 kerberos.msgtype:12 — matches TGS-REQ specifically.
 kerberos.encryption:0x17 — etype 23 (RC4-HMAC) in hex.
 threshold — fires only after 3+ RC4 TGS-REQs from the same source within 60s, reducing noise from legacy-but-legitimate services.
+
+3.1.1 If DC setup for AES only
+Logic: DC has set up for AES encryption only and we need to trigger multiple TGS-REQ to different TGS for a short time. Modern AD environments default to AES-256.
+```bash
+alert krb5 any any -> $DC_SERVERS 88 (msg:"AD Possible Kerberoasting - Multiple TGS-REQ"; krb5_msg_type:12; threshold: type threshold, track by_src, count 3, seconds 60; classtype:attempted-recon; sid:1000002; rev:1;)
+```
 
 3.2 AS-REP Roasting — Missing Pre-Authentication
 Logic: a normal AS-REQ includes a PA-ENC-TIMESTAMP pre-auth field. AS-REP Roasting targets accounts with DONT_REQ_PREAUTH set, so the AS-REQ from the attacker's tool lacks this field entirely.
@@ -96,20 +102,21 @@ Suricata's krb5 keyword set doesn't expose PA-DATA presence, so AS-REP roasting 
 Logic: IDL_DRSGetNCChanges (part of MS-DRSR / DRSUAPI) should only ever be called by a genuine Domain Controller replicating with another DC. A call originating from KALI-ATK's IP is definitive, not probabilistic.
 ```bash
 #/etc/suricata/rules/block2-ad-attacks.rules
-alert tcp any any -> $DC_SERVERS 135 (msg:"AD Possible DCSync - DRSUAPI GetNCChanges from non-DC host"; flow:to_server,established; dce_iface:e3514235-4b06-11d1-ab04-00c04fc2dcd2; dce_opnum:3; classtype:attempted-admin; sid:1000003; rev:1;)
+alert tcp !$DC_SERVERS any -> $DC_SERVERS any (msg:"AD Possible DCSync - DRSUAPI GetNCChanges from non-DC host"; flow:to_server,established; dcerpc.iface:e3514235-4b06-11d1-ab04-00c04fc2dcd2; dcerpc.opnum:3; classtype:attempted-admin; sid:1000003; rev:1;)
 ```
 dce_iface: e3514235-4b06-11d1-ab04-00c04fc2dcd2 — the DRSUAPI interface UUID.
 dce_opnum: 3 — opnum for IDL_DRSGetNCChanges.
 No $DC_SERVERS as source means this rule as written watches inbound calls to the DC — combine with a second rule or a PCAP/BloodHound cross-check confirming the source is NOT another element of $DC_SERVERS, since DC-to-DC replication is legitimate and would otherwise false-positive if you have >1 DC in scope.
 
 So, the final rule file is:
+
 ```bash
 #/etc/suricata/rules/block2-ad-attacks.rules
-alert krb5 any any -> $DC_SERVERS 88 (msg:"AD Possible Kerberoasting - RC4 TGS-REQ"; krb5_msg_type:12; krb5.ticket_encryption:rc4-hmac; threshold: type threshold, track by_src, count 3, seconds 60; classtype:attempted-recon; sid:1000001; rev:1;)
+alert krb5 any any -> $DC_SERVERS 88 (msg:"AD Possible Kerberoasting - Multiple TGS-REQ"; krb5_msg_type:12; threshold: type threshold, track by_src, count 3, seconds 60; classtype:attempted-recon; sid:1000002; rev:1;)
 
-alert tcp any any -> $DC_SERVERS 135 (msg:"AD Possible DCSync - DRSUAPI GetNCChanges from non-DC host"; flow:to_server,established; dce_iface:e3514235-4b06-11d1-ab04-00c04fc2dcd2; dce_opnum:3; classtype:attempted-admin; sid:1000003; rev:1;)
+alert tcp !$DC_SERVERS any -> $DC_SERVERS any (msg:"AD Possible DCSync - DRSUAPI GetNCChanges from non-DC host"; flow:to_server,established; dcerpc.iface:e3514235-4b06-11d1-ab04-00c04fc2dcd2; dcerpc.opnum:3; classtype:attempted-admin; sid:1000003; rev:1;)
 ```
-
+ 
 4. Load Rules Into Suricata
 Step 1 — reference the rule file in suricata.yaml
 ```bash
@@ -136,7 +143,7 @@ Look for Configuration provided was successfully loaded — any syntax error in 
 Step 3 — run Suricata live
 
 ```bash
-sudo suricata -c /etc/suricata/suricata.yaml -i <interface>
+sudo suricata -c /etc/suricata/suricata.yaml -i ens33
 ```
 
 5. Validation — Replay the Captured Attack Traffic
