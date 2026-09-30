@@ -21,6 +21,9 @@ sudo apt update
 
 sudo apt install suricata -y
 
+# enable suricata.rules file
+sudo suricata-update 
+
 suricata --build-info | grep "AF_PACKET"   # confirm AF_PACKET support
 ```
 #### Point Suricata at the correct interface
@@ -104,17 +107,17 @@ Logic: IDL_DRSGetNCChanges (part of MS-DRSR / DRSUAPI) should only ever be calle
 #/etc/suricata/rules/block2-ad-attacks.rules
 alert tcp !$DC_SERVERS any -> $DC_SERVERS any (msg:"AD Possible DCSync - DRSUAPI GetNCChanges from non-DC host"; flow:to_server,established; dcerpc.iface:e3514235-4b06-11d1-ab04-00c04fc2dcd2; dcerpc.opnum:3; classtype:attempted-admin; sid:1000003; rev:1;)
 ```
-dce_iface: e3514235-4b06-11d1-ab04-00c04fc2dcd2 — the DRSUAPI interface UUID.
-dce_opnum: 3 — opnum for IDL_DRSGetNCChanges.
+dcerpc.iface: e3514235-4b06-11d1-ab04-00c04fc2dcd2 — the DRSUAPI interface UUID.
+dcerpc.opnum: 3 — opnum for IDL_DRSGetNCChanges.
 No $DC_SERVERS as source means this rule as written watches inbound calls to the DC — combine with a second rule or a PCAP/BloodHound cross-check confirming the source is NOT another element of $DC_SERVERS, since DC-to-DC replication is legitimate and would otherwise false-positive if you have >1 DC in scope.
 
 So, the final rule file is:
 
 ```bash
 #/etc/suricata/rules/block2-ad-attacks.rules
-alert krb5 any any -> $DC_SERVERS 88 (msg:"AD Possible Kerberoasting - Multiple TGS-REQ"; krb5_msg_type:12; threshold: type threshold, track by_src, count 3, seconds 60; classtype:attempted-recon; sid:1000002; rev:1;)
+alert krb5 any any -> $DC_SERVERS 88 (msg:"AD Possible Kerberoasting - Multiple TGS-REQ"; krb5_msg_type:12; threshold: type threshold, track by_src, count 3, seconds 60; classtype:attempted-recon; sid:1000001; rev:1;)
 
-alert tcp !$DC_SERVERS any -> $DC_SERVERS any (msg:"AD Possible DCSync - DRSUAPI GetNCChanges from non-DC host"; flow:to_server,established; dcerpc.iface:e3514235-4b06-11d1-ab04-00c04fc2dcd2; dcerpc.opnum:3; classtype:attempted-admin; sid:1000003; rev:1;)
+alert tcp !$DC_SERVERS any -> $DC_SERVERS any (msg:"AD Possible DCSync - DRSUAPI GetNCChanges from non-DC host"; flow:to_server,established; dcerpc.iface:e3514235-4b06-11d1-ab04-00c04fc2dcd2; dcerpc.opnum:3; classtype:attempted-admin; sid:1000002; rev:1;)
 ```
  
 4. Load Rules Into Suricata
@@ -148,40 +151,38 @@ sudo suricata -c /etc/suricata/suricata.yaml -i ens33
 
 5. Validation — Replay the Captured Attack Traffic
 Rather than re-running the live attacks every time, replay the pcap from Section 2 to regression-test rule changes quickly.
-
+```bash
 sudo suricata -c /etc/suricata/suricata.yaml -r block2_capture.pcap -l /var/log/suricata/
-
+```
 Step — inspect alerts
-
+```bash
 tail -f /var/log/suricata/fast.log
 
 # or, for structured output:
 
 cat /var/log/suricata/eve.json | jq 'select(.event_type=="alert")'
-
+```
 Confirm three distinct alerts fire, one per attack, matching sid:1000001, 1000002, 1000003.
 
 Step — tune for false positives
 
 Run the same ruleset against a period of normal domain traffic (e.g. a legitimate user logging in, a real service using its SPN normally) and confirm no alerts fire. If legitimate AES-based Kerberos auth is triggering the Kerberoasting rule, the kerberos.encryption:0x17 filter isn't working as intended — check the field syntax against the installed Suricata version.
 
-
 6. Log Review Workflow (Analyst Perspective)
 Once rules are live, the working analyst loop on SENSOR is:
 
 # Watch for anything firing in real time
-
+```bash
 sudo tail -f /var/log/suricata/fast.log
-
+```
 # Pull full JSON detail on a specific alert for write-up screenshots
-
-jq 'select(.alert.signature_id==1000003)' /var/log/suricata/eve.json
-
+```bash
+jq 'select(.alert.signature_id==1000001)' /var/log/suricata/eve.json
+```
 Each alert's eve.json entry should be cross-referenced against:
 
 Source IP → confirm it's KALI-ATK, not a legitimate DC/service.
 Timestamp → correlate with the attack timeline from KALI-ATK's side for the write-up.
-
 
 7. Summary Table — Detection Mapping
 Attack
