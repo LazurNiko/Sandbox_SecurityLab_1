@@ -89,7 +89,11 @@ tail -f /var/log/suricata/fast.log
 #### 3.2 Host-Based Detection (Wazuh)
 Step 1 — Deploy Wazuh manager stack on SENSOR
 ```bash
-curl -sO https://packages.wazuh.com/4.9/wazuh-install.sh
+curl -sO https://packages.wazuh.com/4.12/wazuh-install.sh
+
+#import gpg key
+curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | sudo gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import
+sudo chmod 644 /usr/share/keyrings/wazuh.gpg
 
 sudo bash wazuh-install.sh -a
 ```
@@ -124,6 +128,7 @@ auditpol /set /subcategory:"Directory Service Access" /success:enable /failure:e
 #### Step 4 — Custom Wazuh rule correlating RC4 Kerberos tickets (mirrors the Suricata logic at host level)
 
 Edit /var/ossec/etc/rules/*local_rules.xml* on SENSOR:
+
 ```xml
 
 <group name="windows,kerberos,kerberoasting">
@@ -137,7 +142,7 @@ Edit /var/ossec/etc/rules/*local_rules.xml* on SENSOR:
     <description>Possible Kerberoasting: RC4 (0x17) TGS ticket requested for event 4769</description>
 
     <mitre>
-
+ 
       <id>T1558.003</id>
 
     </mitre>
