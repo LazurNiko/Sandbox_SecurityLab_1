@@ -63,9 +63,9 @@ Step 2 — On KALI-ATK, run each attack in sequence (from block1-attacks/four-at
 Step 3 — Stop the capture and inspect
 
 # Ctrl+C to stop tcpdump, then inspect with Wireshark or tshark
-
+```bash
 tshark -r block2_capture.pcap -Y "kerberos"
-
+```
 Confirm you can see:
 
 AS-REQ packets (message type 10) for AS-REP Roasting
@@ -201,8 +201,6 @@ DCSync
 DRSUAPI GetNCChanges from non-DC
 dce_iface, dce_opnum:3
 1000003
-
-
 
 8. Notes / Lessons Learned
 Building the pcap baseline (Section 2) before writing rules turns rule-writing from guesswork into verification against real field values — critical since Suricata's kerberos keyword names have shifted between versions.

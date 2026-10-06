@@ -8,7 +8,7 @@ flowchart LR
 
         KALI["KALI-ATK\n192.168.100.20\nKali Linux 2024\nAttacker"]
 
-        SENSOR["SENSOR\n192.168.100.40\nUbuntu 22.04\nSuricata · Zeek\nWazuh · TheHive"]
+        SENSOR["SENSOR\n192.168.100.10\nUbuntu 22.04\nSuricata · Zeek\nWazuh · DFIR"]
 
         VICTIM["VICTIM\n192.168.100.100\nWIN_WORKSTATION\nTarget Host"]
 
