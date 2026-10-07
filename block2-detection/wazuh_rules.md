@@ -1,4 +1,4 @@
-<group name="local,corpnet,ad_attacks,">
+<group name="local,corpnet,ad_attacks,windows,sysmon">
 
   <rule id="100201" level="10">
     <if_group>windows_security</if_group>
@@ -38,14 +38,14 @@
     <group>dcsync,credential_access,</group>
   </rule>
 
-  <rule id="100205" level="12">
-    <if_group>sysmon_event12_13</if_group>
+  <rule id="100205" level="15">
+    <if_group>sysmon_event1_12_13</if_group>
     <field name="data.win.eventdata.eventType" type="pcre2">(?i)SetValue</field>
     <field name="data.win.eventdata.image" type="pcre2">(?i)procdump(64)?\.exe$</field>
-    <field name="data.win.eventdata.targetObject" type="pcre2">(?i)\\\\Software\\\\Sysinternals\\\\ProcDump\\\\EulaAccepted$</field>
-    <description>Sysinternals ProcDump Execution - Possible LSASS Credential Dumping Attempt</description>
+    <field name="data.win.eventdata.targetObject" type="pcre2">(?i)lsass</field>
+    <description>Critical: Possible LSASS Credential Dumping</description>
     <mitre><id>T1003.001</id></mitre>
-    <group>lsass_dump,credential_access,sysinternals,</group>
+    <group>lsass_dump,credential_access,sysinternals,sysmon</group>
 </rule>
 
 </group>
