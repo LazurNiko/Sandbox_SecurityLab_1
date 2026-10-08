@@ -107,6 +107,9 @@ msiexec.exe /i wazuh-agent.msi /q WAZUH_MANAGER="192.168.100.40"
 
 NET START WazuhSvc
 
+# for restart Wazuh service 
+Restart-Service WazuhSvc
+
 # optionaly if linux is victim commands below
 
 # curl -o wazuh-agent.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/# wazuh-agent_4.9.0-1_amd64.deb && WAZUH_MANAGER="192.168.100.40" dpkg -i ./wazuh-agent.deb

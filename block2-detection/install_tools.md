@@ -10,5 +10,9 @@ sudo apt install xrdp -y
 ```bash
 sudo apt install chromium-browser -y
 ```
+### Install ntpdate for tyme sync
+```bash
+sudo apt install ntpsec-ntpdate
+```
 ---
 

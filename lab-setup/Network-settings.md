@@ -4,6 +4,10 @@
 Get-NetAdapter
 
 New-NetIPAddress -InterfaceAlias "Ethernet0" -IPAddress 192.168.100.1 -PrefixLength 24
+
+# if problem with dns and lookup failed
+netsh interface ip set dns name="Ethernet0" static 192.168.100.1
+
 ```
 ### Ubuntu server (SENSOR)
 ```bash
