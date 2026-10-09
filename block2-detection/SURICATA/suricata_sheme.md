@@ -1,4 +1,4 @@
-# Suricata Lab — Simplified Architecture
+# Suricata — Simplified Architecture
 
 ```text
                     ┌──────────────────────┐
@@ -11,10 +11,11 @@
                                ▼
                     ┌──────────────────────┐
                     │        SENSOR        |
-                    |      Suricata        │
-                    │                      |
+                    |       Suricata       │
+                    │     Ubuntu Server    |
+                    |                      |
                     |     IDS / Network    │
-                    │      Detection       │
+                    │       Detection      │
                     │                      │
                     │        Rules         │
                     │        PCAP          |

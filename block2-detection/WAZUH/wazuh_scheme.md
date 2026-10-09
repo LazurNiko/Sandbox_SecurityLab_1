@@ -1,12 +1,10 @@
-# Wazuh Lab — Simplified Architecture
+# Wazuh — Simplified Architecture
 
 ```text
                     ┌──────────────────────┐
-                    │   Windows Endpoint   │
+                    │    Windows Target    │
                     │                      │
-                    │  Sysmon              │
-                    │  Security Events      │
-                    │  PowerShell           │
+                    │  DC01.corpnet.local  │
                     └──────────┬───────────┘
                                │
                                │ Wazuh Agent
@@ -39,25 +37,28 @@
 
 Example detection flow:
 
-  ProcDump / LSASS activity
-          │
-          ▼
-       Sysmon
-          │ Event ID 1 / 11 / 13
-          ▼
-    Wazuh Agent
-          │
-          ▼
-    Wazuh Manager
-          │
-          ▼
-   Custom Rule 100205
-          │
-          ▼
-       Alert
-          │
-          ▼
-      Dashboard
+                         KALI-ATK
+  Host attack  ---------------------------  Network attack             
+          │                                        |
+          ▼                                        |
+  ProcDump / LSASS activity                        |
+          │                                        |
+          ▼                                        |
+       Sysmon                                      |
+          │ Event ID 1 / 11 / 13                   |         
+          ▼                                        ▼
+    Wazuh Agent (WORKSTATION)       Wazuh Agent (DC01.corpnet.local)
+          │                                        |
+          ▼                                        ▼
+          --------------  Wazuh Manager ------------                             
+          │                                        |
+          ▼                                        |
+   Custom Rule 100205                  Custom Rules 100201-100204
+          │                                        |
+          --------------  Alert  -------------------    
+                            │
+                            ▼
+                        Dashboard
 ```
 
 ## Main purpose
