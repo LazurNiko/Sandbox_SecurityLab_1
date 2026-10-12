@@ -22,11 +22,66 @@ The structure is designed to accommodate:
 ## 2. Create the Forensic CASE-BASE structure Workspace
 
 ```bash
-CASE="CASE-2026-001"
+CASE1="CASE-2026-001"
+CASE2="CASE-2026-002"
+CASE3="CASE-2026-003"
+CASE4="CASE-2026-004"
+CASE5="CASE-2026-005"
 
-sudo mkdir -p "/forensics/$CASE"/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}
+sudo mkdir -p /forensics/{$CASE1/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}, $CASE2/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}, $CASE3/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}, $CASE4/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}, $CASE5/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}}
 
 sudo touch /forensics/$CASE/evidence_log/{acquisition.txt,chain_of_custody.txt,SHA256SUMS.txt}
+
+# create meta for each
+
+sudo tee /forensics/CASE-2026-001/case_info.txt > /dev/null <<'EOF'
+CASE ID: CASE-2026-001
+Attack: Kerberoasting
+Target: DC01
+Attacker: Kali
+Sensor: Ubuntu Sensor
+MITRE ATT&CK: T1558.003
+EOF
+
+sudo tee /forensics/CASE-2026-002/case_info.txt > /dev/null <<'EOF'
+CASE ID: CASE-2026-002
+Attack: AS-REP Roasting
+Target: DC01
+Attacker: Kali
+Sensor: Ubuntu Sensor
+MITRE ATT&CK: T1558.004
+EOF
+
+sudo tee /forensics/CASE-2026-003/case_info.txt > /dev/null <<'EOF'
+CASE ID: CASE-2026-003
+Attack: DCSync
+Target: DC01
+Attacker: Kali
+Sensor: Ubuntu Sensor
+MITRE ATT&CK: T1003.006
+EOF
+
+sudo tee /forensics/CASE-2026-004/case_info.txt > /dev/null <<'EOF'
+CASE ID: CASE-2026-004
+Attack: Network Attack
+Target: DC01
+Attacker: Kali
+Sensor: Ubuntu Sensor
+MITRE ATT&CK: TBD
+EOF
+
+sudo tee /forensics/CASE-2026-005/case_info.txt > /dev/null <<'EOF'
+CASE ID: CASE-2026-005
+Attack: LSASS Dumping
+Target: Windows Workstation
+Attacker: Kali
+Sensor: Ubuntu Sensor
+MITRE ATT&CK: T1003.001
+EOF
+
+# confirm meta created
+
+sudo find /forensics -name case_info.txt -exec sh -c 'echo "===== $1 ====="; cat "$1"; echo' _ {} \;
 ```
 ## 3. Restrict Access to the Forensic Directory & Assign Ownership
 
@@ -115,8 +170,7 @@ A cryptographic hash should be calculated for acquired evidence.
 For SHA-256:
 
 ```bash
-sha256sum disk01.E01 \
-  | tee /forensics/evidence_log/CASE-2026-001/disk01.E01.sha256
+sha256sum disk01.E01 | tee /forensics/evidence_log/CASE-2026-001/disk01.E01.sha256
 ```
 
 The resulting hash should be preserved in the case documentation.
@@ -161,8 +215,7 @@ Verification can subsequently be performed with:
 ```bash
 cd /forensics/evidence/CASE-2026-001
 
-sha256sum -c \
-  ../../evidence_log/CASE-2026-001/SHA256SUMS.txt
+sha256sum -c ../../evidence_log/CASE-2026-001/SHA256SUMS.txt
 ```
 
 Any file whose contents have changed will fail verification.
