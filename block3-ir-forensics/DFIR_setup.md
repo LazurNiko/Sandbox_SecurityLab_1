@@ -30,7 +30,7 @@ CASE5="CASE-2026-005"
 
 sudo mkdir -p /forensics/{$CASE1/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}, $CASE2/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}, $CASE3/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}, $CASE4/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}, $CASE5/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}}
 
-sudo touch /forensics/$CASE/evidence_log/{acquisition.txt,chain_of_custody.txt,SHA256SUMS.txt}
+sudo touch /forensics/$CASE/evidence_log/{acquisition.txt,chain_of_custody.txt,SHA256SUMS.txt,investigation_notes.md}
 
 # create meta for each
 
@@ -38,50 +38,110 @@ sudo tee /forensics/CASE-2026-001/case_info.txt > /dev/null <<'EOF'
 CASE ID: CASE-2026-001
 Attack: Kerberoasting
 Target: DC01
+Target IP: 192.168.100.1
+Domain: corpnet.local
 Attacker: Kali
 Sensor: Ubuntu Sensor
 MITRE ATT&CK: T1558.003
-EOF
-
-sudo tee /forensics/CASE-2026-002/case_info.txt > /dev/null <<'EOF'
-CASE ID: CASE-2026-002
-Attack: AS-REP Roasting
-Target: DC01
-Attacker: Kali
-Sensor: Ubuntu Sensor
-MITRE ATT&CK: T1558.004
-EOF
-
-sudo tee /forensics/CASE-2026-003/case_info.txt > /dev/null <<'EOF'
-CASE ID: CASE-2026-003
-Attack: DCSync
-Target: DC01
-Attacker: Kali
-Sensor: Ubuntu Sensor
-MITRE ATT&CK: T1003.006
-EOF
-
-sudo tee /forensics/CASE-2026-004/case_info.txt > /dev/null <<'EOF'
-CASE ID: CASE-2026-004
-Attack: Network Attack
-Target: DC01
-Attacker: Kali
-Sensor: Ubuntu Sensor
-MITRE ATT&CK: TBD
-EOF
-
-sudo tee /forensics/CASE-2026-005/case_info.txt > /dev/null <<'EOF'
-CASE ID: CASE-2026-005
-Attack: LSASS Dumping
-Target: Windows Workstation
-Attacker: Kali
-Sensor: Ubuntu Sensor
-MITRE ATT&CK: T1003.001
+Status: Investigation
 EOF
 
 # confirm meta created
 
 sudo find /forensics -name case_info.txt -exec sh -c 'echo "===== $1 ====="; cat "$1"; echo' _ {} \;
+
+# investigation notes example
+
+sudo tee /forensics/CASE-2026-001/evidence_log/investigation_notes > /dev/null <<'EOF'
+# Investigation Notes
+
+## 2026-10-13 — Baseline
+
+### Environment
+Target: DC01
+Target IP: 192.168.100.1
+Attacker: Kali
+Sensor: Ubuntu Sensor
+
+### Pre-Attack Checks
+
+Time: 2026-10-13 19:50:12 +03:00
+
+Windows Security Event ID 4769:
+Existing events: YES
+
+Purpose:
+Check existing Kerberos TGS events before attack
+to establish the pre-attack state.
+
+Observation:
+Existing Event ID 4769 events were present before the attack.
+These events must be excluded from the attack timeline
+based on their timestamps.
+
+### Monitoring Status
+
+Wazuh: Operational
+Windows Security logging: Operational
+Suricata: Operational
+Zeek: Operational
+
+## Attack Execution
+
+Start:
+2026-10-13 19:55:03 +03:00
+
+Tool:
+Impacket GetUserSPNs
+
+Technique:
+Kerberoasting
+
+MITRE ATT&CK:
+T1558.003
+
+Target:
+DC01
+
+End:
+2026-10-13 19:56:21 +03:00
+
+## Evidence Collection
+
+### Windows Security
+Event ID: 4769
+Source: DC01
+
+### Wazuh
+Alert: 100201
+
+### Suricata
+Evidence: ...
+
+### Zeek
+Evidence: ...
+
+### PCAP
+Evidence: ...
+EOF
+
+# evidence_log/acqusition.txt
+sudo tee /forensics/CASE-2026-001/evidence_log/investigation_notes.md > /dev/null <<'EOF'
+
+CASE: CASE-2026-001
+
+Evidence ID: E001
+Source: DC01
+Artifact: Windows Security Event ID 4769
+Acquisition time: 2026-10-13 19:57:10 +03:00
+Destination: evidence/windows_logs/kerberoasting_4769.txt
+
+Evidence ID: E002
+Source: Ubuntu Sensor
+Artifact: Wazuh Kerberoasting alert
+Acquisition time: 2026-10-13 19:58:02 +03:00
+Destination: evidence/windows_logs/wazuh_kerberoasting.json
+EOF
 ```
 ## 3. Restrict Access to the Forensic Directory & Assign Ownership
 
@@ -126,6 +186,7 @@ CASE-2026-001/
     ├── acquisition.txt
     ├── chain_of_custody.txt
     └── SHA256SUMS.txt
+    └── investigation_notes.md
 ```
 
 ## DFIR Case Directory Structure
