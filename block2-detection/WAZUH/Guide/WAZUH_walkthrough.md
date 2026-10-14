@@ -15,8 +15,85 @@ This document walks through host-level detection in Wazuh for the four Active Di
 Lab topology: DC01 (domain controller), KALI-ATK (attacker), SENSOR (Suricata + Wazuh manager), VICTIM (Wazuh agent), all on the isolated 192.168.100.0/24 segment (VMnet2).
 
 
-0. Prerequisites
-0.1 Wazuh agent on DC01
+### 0. Prerequisites
+### 0.1 Wazuh agent on DC01
+#### 0.1.2 Host-Based Detection (Wazuh)
+Step 1 — Deploy Wazuh manager stack on SENSOR
+```bash
+curl -sO https://packages.wazuh.com/4.12/wazuh-install.sh
+
+#import gpg key
+curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | sudo gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import
+sudo chmod 644 /usr/share/keyrings/wazuh.gpg
+
+sudo bash wazuh-install.sh -a
+```
+#### 0.1.3 — Install and register agents on DC01 and VICTIM
+```powershell
+# Both On DC01 and WORKSTATION (PowerShell, administrator, )
+
+Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-4.9.0-1.msi -OutFile wazuh-agent.msi
+
+msiexec.exe /i wazuh-agent.msi /q WAZUH_MANAGER="192.168.100.40"
+
+NET START WazuhSvc
+
+# for restart Wazuh service 
+Restart-Service WazuhSvc
+
+# optionaly if linux is victim commands below
+
+# curl -o wazuh-agent.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/# wazuh-agent_4.9.0-1_amd64.deb && WAZUH_MANAGER="192.168.100.40" dpkg -i ./wazuh-agent.deb
+
+# sudo systemctl enable wazuh-agent --now
+```
+
+#### 0.1.4 — Enable Windows Security Log forwarding on DC01
+
+Confirm Advanced Audit Policy captures Kerberos operations (needed for Event IDs 4768/4769/4662):
+```powershell
+auditpol /set /subcategory:"Kerberos Service Ticket Operations" /success:enable /failure:enable
+
+auditpol /set /subcategory:"Kerberos Authentication Service" /success:enable /failure:enable
+
+auditpol /set /subcategory:"Directory Service Access" /success:enable /failure:enable
+```
+
+#### 0.1.5 — Custom Wazuh rule correlating RC4 Kerberos tickets (mirrors the Suricata logic at host level)
+
+Edit /var/ossec/etc/rules/*local_rules.xml* on SENSOR:
+
+```xml
+
+<group name="windows,kerberos,kerberoasting">
+
+  <rule id="100010" level="10">
+
+    <if_group>windows</if_group>
+
+    <field name="win.eventdata.ticketEncryptionType">0x17</field>
+
+    <description>Possible Kerberoasting: RC4 (0x17) TGS ticket requested for event 4769</description>
+
+    <mitre>
+ 
+      <id>T1558.003</id>
+
+    </mitre>
+
+  </rule>
+
+</group>
+```
+Restart Wazuh to load the rule
+
+```bash
+sudo systemctl restart wazuh-manager
+```
+
+3.3 Cross-Validation
+Deliberately re-run one-by-one attacks from Block 1 against the restored baseline, and confirm both alerts fire — Suricata (network) and Wazuh (host) — for the same event, within seconds of each other. Document the timestamp delta.
+
 Confirm the agent is registered and active before generating any events on Sensor:
 
 ```bash
@@ -36,6 +113,7 @@ auditpol /set /subcategory:"Directory Service Access" /success:enable
 
 0.3 SACL on the domain object (required for 4662 / DCSync)
 Audit policy alone is not enough for 4662 — the domain object itself needs a System Access Control List entry for "Everyone" (or specifically for replication rights), configured via ADSI Edit or dsacls, before DS-Replication-Get-Changes attempts are logged.
+
 0.4 Sysmon on DC01 (required for LSASS detection)
 Standard Windows Security log does not capture process memory access. Sysmon's Event ID 10 (ProcessAccess) does:
 
@@ -48,7 +126,7 @@ Invoke-WebRequest -Uri https://raw.github.com/SwiftOnSecurity/sysmon-config/mast
 ```
 (Use a config that logs TargetImage containing lsass.exe, e.g. a SwiftOnSecurity base config.)
 
-1. Kerberoasting — Event 4769, RC4 Ticket
+### 1. Kerberoasting — Event 4769, RC4 Ticket
 1.1 Attack execution (KALI-ATK)
 GetUserSPNs.py corpnet.local/user:password -dc-ip 192.168.100.1 -request
 1.2 What Windows logs
@@ -56,13 +134,15 @@ Event 4769 (A Kerberos service ticket was requested) with TicketEncryptionType =
 
 1.3 Wazuh rule
 
-![Wazuh rule.id 100201, 100202](/Sandbox_SecurityLab_1/block2-detection/wazuh_rules.md)
+![Wazuh rule.id 100201, 100202](/Sandbox_SecurityLab_1/block2-detection/WAZUH/Guide/wazuh_rules.md)
 
 Why ServiceName is excluded for krbtgt and machine accounts ($): both routinely request/renew tickets as part of normal domain operation and would otherwise generate noise.
+
 1.4 Verification in Wazuh Dashboard
 Open Security Events → filter rule.id: 100201.
 Confirm fields present: data.win.eventdata.TicketEncryptionType, data.win.eventdata.ServiceName, data.win.eventdata.TargetUserName.
 Re-run the attack 3+ times within 60s from the same source to trigger 100202 and confirm the frequency rule fires.
+
 1.5 Sample decoded event (fill in from your run)
 ```json
 {
@@ -96,7 +176,7 @@ Re-run the attack 3+ times within 60s from the same source to trigger 100202 and
 }
 ```
 
-2. AS-REP Roasting — Event 4768, No Pre-Authentication
+### 2. AS-REP Roasting — Event 4768, No Pre-Authentication
 2.1 Attack execution (KALI-ATK)
 GetNPUsers.py corpnet.local/ -usersfile users.txt -dc-ip 192.168.100.1 -no-pass
 
@@ -113,7 +193,7 @@ Suricata's native krb5_* keyword set (as of 8.0.x) does not expose the PA-DATA f
 2.5 Verification
 Filter rule.id: 100203 in Wazuh Dashboard, confirm data.win.eventdata.PreAuthType = 0 and TargetUserName matches the account configured without pre-auth.
 
-3. DCSync — Event 4662, Replication Rights
+### 3. DCSync — Event 4662, Replication Rights
 3.1 Attack execution (KALI-ATK)
 secretsdump.py -just-dc corpnet.local/user:password@192.168.100.1
 3.2 What Windows logs
@@ -133,7 +213,7 @@ The Suricata rule for this same attack (sid:1000002) matches dcerpc.opnum:3 (IDL
 Filter rule.id: 100204, confirm Properties contains one of the two GUIDs above and SubjectUserName is a real user account, not a $ machine account.
 
 
-4. LSASS Credential Dumping — Sysmon Event 10
+### 4. LSASS Credential Dumping — Sysmon Event 10
 4.1 Attack execution (on DC01 or VICTIM, post-compromise)
 Example via a tool like procdump or mimikatz sekurlsa::logonpasswords
 ```bash
@@ -150,11 +230,11 @@ Event ID 10 (ProcessAccess) with TargetImage ending in lsass.exe and a GrantedAc
 Filter rule.id: 100205, confirm SourceImage (the process that opened the handle) is not a trusted AV/EDR process — tune the rule with a negate="yes" exclusion list if your lab generates false positives from legitimate security tooling.
 
 
-5. Cross-Validation (Network vs. Host)
+### 5. Cross-Validation (Network vs. Host)
 For Kerberoasting and DCSync, both layers fire independently for the same event. Methodology, results table, and timestamp-delta notes are tracked separately in block2-cross-validation.md (Section 3.3 of the write-up) — re-run each attack against a freshly restored snapshot, tail both eve.json and alerts.json in parallel, and record the delta. Expect Wazuh to lag Suricata by roughly the log-collector polling interval, not real time — this is expected behavior, not a detection failure.
 
 
-6. Syntax Verification Checklist (before every manager restart)
+### 6. Syntax Verification Checklist (before every manager restart)
 ```bash
 sudo /var/ossec/bin/wazuh-analysisd -t
 

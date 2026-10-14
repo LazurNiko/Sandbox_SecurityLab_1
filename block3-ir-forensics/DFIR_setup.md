@@ -65,7 +65,7 @@ Sensor: Ubuntu Sensor
 
 ### Pre-Attack Checks
 
-Time: 2026-10-13 19:50:12 +03:00
+Time: ...
 
 Windows Security Event ID 4769:
 Existing events: YES
@@ -89,7 +89,7 @@ Zeek: Operational
 ## Attack Execution
 
 Start:
-2026-10-13 19:55:03 +03:00
+...
 
 Tool:
 Impacket GetUserSPNs
@@ -104,7 +104,7 @@ Target:
 DC01
 
 End:
-2026-10-13 19:56:21 +03:00
+...
 
 ## Evidence Collection
 
@@ -116,7 +116,30 @@ Source: DC01
 Alert: 100201
 
 ### Suricata
-Evidence: ...
+Evidence:
+
+EVE JSON:
+Relevant network telemetry observed.
+
+Fast Log:
+No Kerberoasting-specific alert observed.
+
+Conclusion:
+Suricata did not generate a matching IDS alert for the observed Kerberoasting activity.
+
+|Sensor interface: ens33
+
+|PCAP:
+|kerberoasting_DATE-HERE.pcap
+
+|Suricata:
+|- eve.json contained Kerberos-related network events.
+|- fast.log: no matching custom signature observed.
+|- No Suricata alert was generated for SID 1000001.
+
+|Interpretation:
+|Absence of a Suricata alert does not indicate absence of the attack.
+|Windows Event ID 4769 and Wazuh telemetry provide the primary detection evidence.
 
 ### Zeek
 Evidence: ...
@@ -125,22 +148,59 @@ Evidence: ...
 Evidence: ...
 EOF
 
-# evidence_log/acqusition.txt
-sudo tee /forensics/CASE-2026-001/evidence_log/investigation_notes.md > /dev/null <<'EOF'
+# evidence_log/acquisition.txt
+sudo tee /forensics/CASE-2026-001/evidence_log/acquisition.txt > /dev/null <<'EOF'
 
 CASE: CASE-2026-001
 
 Evidence ID: E001
 Source: DC01
+Collector: Windows Event Log / PowerShell
 Artifact: Windows Security Event ID 4769
-Acquisition time: 2026-10-13 19:57:10 +03:00
+Original Path: Windows Security Event Log
+Acquisition time: ...
 Destination: evidence/windows_logs/kerberoasting_4769.txt
+Collected By: Niko Lazur
+Description: Kerberos service ticket events collected from DC01 during the Kerberoasting investigation.
 
 Evidence ID: E002
 Source: Ubuntu Sensor
 Artifact: Wazuh Kerberoasting alert
-Acquisition time: 2026-10-13 19:58:02 +03:00
+Original Path: /var/ossec/logs/alerts/alerts.json
+Acquisition time: ...
 Destination: evidence/windows_logs/wazuh_kerberoasting.json
+Collected By: Niko Lazur
+Description: Wazuh alert generated from Windows Security Event ID 4769.
+
+Evidence ID: E003
+Source: Ubuntu Sensor
+Collector: tcpdump
+Artifact: PCAP
+Original path: /home/sensor/capture.pcap
+Acquisition time: ...
+Destination: evidence/pcaps/
+Collected By: Niko Lazur
+Description: Network traffic captured during the Kerberoasting attack window.
+
+Evidence ID: E003
+Source: Ubuntu Sensor
+Collector: Suricata
+Artifact: Suricata EVE JSON
+Original Path: /var/log/suricata/eve.json
+Acquisition Time: 2026-10-14 21:30:00 +03:00
+Destination: evidence/suricata/eve.json
+Collected By: Niko Lazur
+Description: Structured Suricata network telemetry collected during the Kerberoasting investigation.
+
+Evidence ID: E004
+Source: Ubuntu Sensor
+Collector: Suricata
+Artifact: Suricata Fast Log
+Original Path: /var/log/suricata/fast.log
+Acquisition Time: ...
+Destination: evidence/suricata/fast.log
+Collected By: Niko Lazur
+Description: Suricata Rule IDS alerts generated during the Kerberoasting investigation.
 EOF
 ```
 ## 3. Restrict Access to the Forensic Directory & Assign Ownership
