@@ -86,78 +86,24 @@ sudo suricata -c /etc/suricata/suricata.yaml -i <interface>
 
 tail -f /var/log/suricata/fast.log
 ```
-#### 3.2 Host-Based Detection (Wazuh)
-Step 1 — Deploy Wazuh manager stack on SENSOR
-```bash
-curl -sO https://packages.wazuh.com/4.12/wazuh-install.sh
-
-#import gpg key
-curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | sudo gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import
-sudo chmod 644 /usr/share/keyrings/wazuh.gpg
-
-sudo bash wazuh-install.sh -a
-```
-#### Step 2 — Install and register agents on DC01 and VICTIM
-```powershell
-# Both On DC01 and WORKSTATION (PowerShell, administrator, )
-
-Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-4.9.0-1.msi -OutFile wazuh-agent.msi
-
-msiexec.exe /i wazuh-agent.msi /q WAZUH_MANAGER="192.168.100.40"
-
-NET START WazuhSvc
-
-# for restart Wazuh service 
-Restart-Service WazuhSvc
-
-# optionaly if linux is victim commands below
-
-# curl -o wazuh-agent.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/# wazuh-agent_4.9.0-1_amd64.deb && WAZUH_MANAGER="192.168.100.40" dpkg -i ./wazuh-agent.deb
-
-# sudo systemctl enable wazuh-agent --now
-```
-
-#### Step 3 — Enable Windows Security Log forwarding on DC01
-
-Confirm Advanced Audit Policy captures Kerberos operations (needed for Event IDs 4768/4769/4662):
-```powershell
-auditpol /set /subcategory:"Kerberos Service Ticket Operations" /success:enable /failure:enable
-
-auditpol /set /subcategory:"Kerberos Authentication Service" /success:enable /failure:enable
-
-auditpol /set /subcategory:"Directory Service Access" /success:enable /failure:enable
-```
-
-#### Step 4 — Custom Wazuh rule correlating RC4 Kerberos tickets (mirrors the Suricata logic at host level)
-
-Edit /var/ossec/etc/rules/*local_rules.xml* on SENSOR:
-
-```xml
-
-<group name="windows,kerberos,kerberoasting">
-
-  <rule id="100010" level="10">
-
-    <if_group>windows</if_group>
-
-    <field name="win.eventdata.ticketEncryptionType">0x17</field>
-
-    <description>Possible Kerberoasting: RC4 (0x17) TGS ticket requested for event 4769</description>
-
-    <mitre>
- 
-      <id>T1558.003</id>
-
-    </mitre>
-
-  </rule>
-
-</group>
-```
-
-Step 5 — Restart Wazuh to load the rule
+#### 3.2 Network Detection (Wazuh)
 ```bash
 sudo systemctl restart wazuh-manager
 ```
-3.3 Cross-Validation
-Deliberately re-run one-by-one attacks from Block 1 against the restored baseline, and confirm both alerts fire — Suricata (network) and Wazuh (host) — for the same event, within seconds of each other. Document the timestamp delta.
+Confirm On wazuh Dashboard see the both Active Agents (DC01, WORKSTATION)
+
+#### 3.3 Network detection (Zeek)
+```bash
+sudo mkdir -p /forensics/CASE-2026-001/working/zeek
+cd /forensics/CASE-2026-001/working/zeek
+
+sudo zeek -C -i ens33
+```
+logs to analyze:
+
+```text
+conn.log
+kerberos.log
+notice.log        ← if created
+weird.log         ← for suspicious activity
+```

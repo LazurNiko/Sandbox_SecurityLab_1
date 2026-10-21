@@ -171,11 +171,11 @@ Run the same ruleset against a period of normal domain traffic (e.g. a legitimat
 6. Log Review Workflow (Analyst Perspective)
 Once rules are live, the working analyst loop on SENSOR is:
 
-# Watch for anything firing in real time
+Watch for anything firing in real time
 ```bash
 sudo tail -f /var/log/suricata/fast.log
 ```
-# Pull full JSON detail on a specific alert for write-up screenshots
+Pull full JSON detail on a specific alert for write-up screenshots
 ```bash
 jq 'select(.alert.signature_id==1000001)' /var/log/suricata/eve.json
 ```

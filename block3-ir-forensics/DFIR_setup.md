@@ -22,11 +22,186 @@ The structure is designed to accommodate:
 ## 2. Create the Forensic CASE-BASE structure Workspace
 
 ```bash
-CASE="CASE-2026-001"
+CASE1="CASE-2026-001"
+CASE2="CASE-2026-002"
+CASE3="CASE-2026-003"
+CASE4="CASE-2026-004"
+CASE5="CASE-2026-005"
 
-sudo mkdir -p "/forensics/$CASE"/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}
+sudo mkdir -p /forensics/{$CASE1/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}, $CASE2/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}, $CASE3/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}, $CASE4/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}, $CASE5/{evidence/{disk_images,memory_dumps,pcaps,windows_logs,collected_files},working/{extracted,mounted,parsed},output/{timeline,iocs,screenshots,report},evidence_log}}
 
-sudo touch /forensics/$CASE/evidence_log/{acquisition.txt,chain_of_custody.txt,SHA256SUMS.txt}
+sudo touch /forensics/$CASE/evidence_log/{acquisition.txt,chain_of_custody.txt,SHA256SUMS.txt,investigation_notes.md}
+
+# create meta for each
+
+sudo tee /forensics/CASE-2026-001/case_info.txt > /dev/null <<'EOF'
+CASE ID: CASE-2026-001
+Attack: Kerberoasting
+Target: DC01
+Target IP: 192.168.100.1
+Domain: corpnet.local
+Attacker: Kali
+Sensor: Ubuntu Sensor
+MITRE ATT&CK: T1558.003
+Status: Investigation
+EOF
+
+# confirm meta created
+
+sudo find /forensics -name case_info.txt -exec sh -c 'echo "===== $1 ====="; cat "$1"; echo' _ {} \;
+
+# investigation notes example
+
+sudo tee /forensics/CASE-2026-001/evidence_log/investigation_notes > /dev/null <<'EOF'
+# Investigation Notes
+
+## 2026-10-13 — Baseline
+
+### Environment
+Target: DC01
+Target IP: 192.168.100.1
+Attacker: Kali
+Sensor: Ubuntu Sensor
+
+### Pre-Attack Checks
+
+Time: ...
+
+Windows Security Event ID 4769:
+Existing events: YES
+
+Purpose:
+Check existing Kerberos TGS events before attack
+to establish the pre-attack state.
+
+Observation:
+Existing Event ID 4769 events were present before the attack.
+These events must be excluded from the attack timeline
+based on their timestamps.
+
+### Monitoring Status
+
+Wazuh: Operational
+Windows Security logging: Operational
+Suricata: Operational
+Zeek: Operational
+
+## Attack Execution
+
+Start:
+...
+
+Tool:
+Impacket GetUserSPNs
+
+Technique:
+Kerberoasting
+
+MITRE ATT&CK:
+T1558.003
+
+Target:
+DC01
+
+End:
+...
+
+## Evidence Collection
+
+### Windows Security
+Event ID: 4769
+Source: DC01
+
+### Wazuh
+Alert: 100201
+
+### Suricata
+Evidence:
+
+EVE JSON:
+Relevant network telemetry observed.
+
+Fast Log:
+No Kerberoasting-specific alert observed.
+
+Conclusion:
+Suricata did not generate a matching IDS alert for the observed Kerberoasting activity.
+
+|Sensor interface: ens33
+
+|PCAP:
+|kerberoasting_DATE-HERE.pcap
+
+|Suricata:
+|- eve.json contained Kerberos-related network events.
+|- fast.log: no matching custom signature observed.
+|- No Suricata alert was generated for SID 1000001.
+
+|Interpretation:
+|Absence of a Suricata alert does not indicate absence of the attack.
+|Windows Event ID 4769 and Wazuh telemetry provide the primary detection evidence.
+
+### Zeek
+Evidence: ...
+
+### PCAP
+Evidence: ...
+EOF
+
+# evidence_log/acquisition.txt
+sudo tee /forensics/CASE-2026-001/evidence_log/acquisition.txt > /dev/null <<'EOF'
+
+CASE: CASE-2026-001
+
+Evidence ID: E001
+Source: DC01
+Collector: Windows Event Log / PowerShell
+Artifact: Windows Security Event ID 4769
+Original Path: Windows Security Event Log
+Acquisition time: ...
+Destination: evidence/windows_logs/kerberoasting_4769.txt
+Collected By: Niko Lazur
+Description: Kerberos service ticket events collected from DC01 during the Kerberoasting investigation.
+
+Evidence ID: E002
+Source: Ubuntu Sensor
+Artifact: Wazuh Kerberoasting alert
+Original Path: /var/ossec/logs/alerts/alerts.json
+Acquisition time: ...
+Destination: evidence/windows_logs/wazuh_kerberoasting.json
+Collected By: Niko Lazur
+Description: Wazuh alert generated from Windows Security Event ID 4769.
+
+Evidence ID: E003
+Source: Ubuntu Sensor
+Collector: tcpdump
+Artifact: PCAP
+Original path: /home/sensor/capture.pcap
+Acquisition time: ...
+Destination: evidence/pcaps/
+Collected By: Niko Lazur
+Description: Network traffic captured during the Kerberoasting attack window.
+
+Evidence ID: E003
+Source: Ubuntu Sensor
+Collector: Suricata
+Artifact: Suricata EVE JSON
+Original Path: /var/log/suricata/eve.json
+Acquisition Time: 2026-10-14 21:30:00 +03:00
+Destination: evidence/suricata/eve.json
+Collected By: Niko Lazur
+Description: Structured Suricata network telemetry collected during the Kerberoasting investigation.
+
+Evidence ID: E004
+Source: Ubuntu Sensor
+Collector: Suricata
+Artifact: Suricata Fast Log
+Original Path: /var/log/suricata/fast.log
+Acquisition Time: ...
+Destination: evidence/suricata/fast.log
+Collected By: Niko Lazur
+Description: Suricata Rule IDS alerts generated during the Kerberoasting investigation.
+EOF
 ```
 ## 3. Restrict Access to the Forensic Directory & Assign Ownership
 
@@ -71,6 +246,7 @@ CASE-2026-001/
     ├── acquisition.txt
     ├── chain_of_custody.txt
     └── SHA256SUMS.txt
+    └── investigation_notes.md
 ```
 
 ## DFIR Case Directory Structure
@@ -115,8 +291,7 @@ A cryptographic hash should be calculated for acquired evidence.
 For SHA-256:
 
 ```bash
-sha256sum disk01.E01 \
-  | tee /forensics/evidence_log/CASE-2026-001/disk01.E01.sha256
+sha256sum disk01.E01 | tee /forensics/evidence_log/CASE-2026-001/disk01.E01.sha256
 ```
 
 The resulting hash should be preserved in the case documentation.
@@ -161,8 +336,7 @@ Verification can subsequently be performed with:
 ```bash
 cd /forensics/evidence/CASE-2026-001
 
-sha256sum -c \
-  ../../evidence_log/CASE-2026-001/SHA256SUMS.txt
+sha256sum -c ../../evidence_log/CASE-2026-001/SHA256SUMS.txt
 ```
 
 Any file whose contents have changed will fail verification.

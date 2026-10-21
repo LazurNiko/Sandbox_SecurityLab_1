@@ -12,4 +12,3 @@ cp .env.example .env
 # set up .env (passwords, ports)
 docker compose up -d
 ```
-  
