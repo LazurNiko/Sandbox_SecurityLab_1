@@ -1,0 +1,11 @@
+CASE: CASE-2026-001
+
+Evidence ID: E001
+Source: DC01
+Collector: Windows Event Log / PowerShell
+Artifact: Windows Security Event ID 4769
+Original Path: Windows Security Event Log
+Acquisition time: ...
+Destination: evidence/windows_logs/kerberoasting_4769.txt
+Collected By: Niko Lazur
+Description: Kerberos service ticket events collected from DC01 during the Kerberoasting investigation.

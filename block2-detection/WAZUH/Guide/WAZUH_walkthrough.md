@@ -123,6 +123,27 @@ Invoke-WebRequest -Uri https://live.sysinternals.com/Sysmon64.exe -OutFile Sysmo
 Invoke-WebRequest -Uri https://raw.github.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml -OutFile sysmonconfig.xml
 
 .\Sysmon64.exe -accepteula -i sysmonconfig.xml
+
+### On Victim Edit sysmonconfig.xml to catch lsass.exe process
+# sysmonconfig.xml
+<Sysmon schemaversion="4.90">
+    ...
+
+    <EventFiltering>
+
+        ...
+
+        <ProcessAccess onmatch="include">
+            <TargetImage condition="is">C:\Windows\System32\lsass.exe</TargetImage>
+        </ProcessAccess>
+
+        ...
+
+    </EventFiltering>
+</Sysmon>
+
+# update configuration file
+.\Sysmon64.exe -c sysmonconfig.xml
 ```
 (Use a config that logs TargetImage containing lsass.exe, e.g. a SwiftOnSecurity base config.)
 

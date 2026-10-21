@@ -91,3 +91,19 @@ tail -f /var/log/suricata/fast.log
 sudo systemctl restart wazuh-manager
 ```
 Confirm On wazuh Dashboard see the both Active Agents (DC01, WORKSTATION)
+
+#### 3.3 Network detection (Zeek)
+```bash
+sudo mkdir -p /forensics/CASE-2026-001/working/zeek
+cd /forensics/CASE-2026-001/working/zeek
+
+sudo zeek -C -i ens33
+```
+logs to analyze:
+
+```text
+conn.log
+kerberos.log
+notice.log        ← if created
+weird.log         ← for suspicious activity
+```
