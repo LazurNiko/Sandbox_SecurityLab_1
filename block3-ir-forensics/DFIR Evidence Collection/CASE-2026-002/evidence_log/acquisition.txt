@@ -1,11 +1,56 @@
 CASE: CASE-2026-002
 
-Evidence ID: E002
-Source: DC01
-Collector: Windows Event Log / PowerShell
-Artifact: Windows Security Event ID 4768
+Evidence ID: E002-01
+Source: DC01 / Windows Security
+Collector: wevtutil
+Artifact: DC01-Security_4768.evtx
 Original Path: Windows Security Event Log
-Acquisition time: ...
-Destination: evidence/windows_logs/kerberoasting_4769.txt
+Acquisition time: 2026-10-22T01:31:47.078+0000
+Destination: /forensics/CASE-2026-001/evidence/windows_logs/
 Collected By: Niko Lazur
-Description: Kerberos service ticket events collected from DC01 during the Kerberoasting investigation.
+SHA-256: 
+Description: Kerberos service ticket events collected from DC01 during the AS-REP Roasting investigation.
+
+Evidence ID: E002-02
+Source: SENSOR / SURICATA
+Collector: cp
+Artifact: eve.json
+Original Path: /var/log/suricata/
+Acquisition time: 2026-10-22T01:31:47.078+0000
+Destination: /forensics/CASE-2026-002/evidence/SURICATA/
+Collected By: Niko Lazur
+SHA-256: 
+Description: Wazuh alert subset containing references during the AS-REP Roasting investigation.
+
+Evidence ID: E-002-03
+Source: Wazuh Manager
+Collector: grep
+Artifact: event-4768-archives.json
+Original Path: /var/ossec/logs/archives/archives.json
+Acquisition Time: 2026-10-22T01:31:47.078+0000
+Destination: /forensics/CASE-2026-001/evidence/WAZUH/
+Collected By: Niko Lazur
+SHA-256: 
+Description: Wazuh alert subset containing references to Event ID 4769
+
+Evidence ID: E-002-04
+Source: Wazuh Manager
+Collector: grep
+Artifact: asrep-alerts.json
+Original Path: /var/ossec/logs/alerts/alerts.json
+Acquisition Time: 2026-10-22T01:31:47.078+0000
+Destination: /forensics/CASE-2026-001/evidence/WAZUH/
+Collected By: Niko Lazur
+SHA-256: 
+Description: Wazuh alert subset containing references to Event ID 4769
+
+Evidence ID: E-002-05
+Source: SENSOR / tcpdump
+Collector: tcpdump
+Artifact: block2-asreproasting.pcap
+Original path: /home/sensor/
+Acquisition time: 2026-10-21 07:45:22
+Destination: /forensics/CASE-2026-001/evidence/pcaps/
+Collected by: Niko Lazur
+SHA-256: 
+Description: Network packet capture collected for investigation of suspected AS-REP Roasting activity.
