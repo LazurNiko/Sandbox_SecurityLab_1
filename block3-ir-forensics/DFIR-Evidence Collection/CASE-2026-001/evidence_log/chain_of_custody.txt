@@ -1,0 +1,13 @@
+CASE: CASE-2026-001
+Evidence ID: E005-01
+Artifact: kerberoasting.pcap
+
+Date/Time                      Action                      From 
+2026-10-25 09:39:00            Acquisition                 SENSOR
+2026-10-25 09:45:00            SHA-256 calculated          Evidence file
+
+Integrity:
+SHA-256: 33ce952c7d73db7e967f30427018e3fe85c67c3d449851df6c4a4514344c7a95
+
+Notes:
+Original evidence preserved. Analysis will be performed on a working copy

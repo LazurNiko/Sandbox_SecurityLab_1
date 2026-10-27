@@ -34,7 +34,7 @@ sudo bash wazuh-install.sh -a
 
 Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-4.9.0-1.msi -OutFile wazuh-agent.msi
 
-msiexec.exe /i wazuh-agent.msi /q WAZUH_MANAGER="192.168.100.40"
+msiexec.exe /i wazuh-agent.msi /q WAZUH_MANAGER="192.168.100.10"
 
 NET START WazuhSvc
 

@@ -1,0 +1,16 @@
+Timestamp_Original	Час події у вихідному джерелі
+Timezone_Original	Часовий пояс джерела, якщо відомий
+Timestamp_UTC	Час події, приведений до UTC
+Source	PCAP, DC01 Security, Wazuh або Suricata
+Event_ID_or_Type	Наприклад, Kerberos TGS-REP або Event ID 4769
+Source_IP	IP-адреса джерела, якщо доступна
+Destination_IP	IP-адреса призначення, якщо доступна
+Account_or_Service	Обліковий запис або сервіс, якщо визначений
+Evidence_File	Назва файлу, з якого отримано подію
+Notes	Коментар або результат зіставлення
+Timestamp_Original,Timezone_Original,Timestamp_UTC,Source,Event_ID_or_Type,Source_IP,Destination_IP,Account_or_Service,Evidence_File,Notes
+2026-10-25 09:35:22,+02:00,2026-10-25 07:35:57,PCAP,Kerberos TGS-REQ (12),192.168.100.20,192.168.100.1,svc-backup,kerberoasting-working.pcap,Запит TGS від клієнта до DC01
+2026-10-25 09:35:22,+02:00,2026-10-25 07:35:22,DC01 Security,Event ID 4769,192.168.100.20,192.168.100.1,svc-backup,DC01-Security.evtx,Запис про запит сервісного квитка
+2026-10-25 09:35:22,+02:00,2026-10-25 07:35:22,PCAP,Kerberos TGS-REP (13),192.168.100.1,192.168.100.20,svc-backup,kerberoasting-working.pcap,Відповідь KDC з TGS
+2026-10-25 09:35:58,+02:00,2026-10-25 07:35:58,Wazuh,Rule 100201,192.168.100.20,192.168.100.1,svc-backup,alerts.json,Спрацювання правила Kerberoasting
+2026-10-25 09:35:57,+02:00,2026-10-25 07:35:57,Suricata,SID 1000001,192.168.100.20,192.168.100.1,svc-backup,eve.json,Мережеве спрацювання правила

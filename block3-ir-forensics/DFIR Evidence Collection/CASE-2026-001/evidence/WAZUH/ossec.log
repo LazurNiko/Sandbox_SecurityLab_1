@@ -1,8 +1,0 @@
-2026/10/20 00:21:29 wazuh-monitord: INFO: Starting new log after rotation.
-2026/10/20 03:22:04 wazuh-syscheckd: INFO: (6009): File integrity monitoring scan ended.
-2026/10/20 03:25:20 rootcheck: INFO: Ending rootcheck scan.
-2026/10/20 04:12:37 wazuh-modulesd:syscollector: INFO: Starting evaluation.
-2026/10/20 04:13:01 wazuh-modulesd:syscollector: INFO: Evaluation finished.
-2026/10/20 04:21:18 wazuh-modulesd:content-updater: WARNING: Offset processing failed. Triggered a snapshot download.
-2026/10/20 04:21:18 wazuh-modulesd:content-updater: WARNING: Couldn't run full content download: Error -1 from server: Could not resolve hostname.
-2026/10/20 04:21:18 wazuh-modulesd:content-updater: ERROR: Action for 'vulnerability_feed_manager' failed: Error -1 from server: Could not resolve hostname.

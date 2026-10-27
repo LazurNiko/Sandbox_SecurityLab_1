@@ -1,0 +1,2 @@
+﻿frame.number,frame.time,frame.time_epoch,ip.src,ip.dst,kerberos.msg_type,kerberos.CNameString
+828,2026-10-25T09:37:51.645219000+0200,1792913871.645219000,192.168.100.1,192.168.100.20,11,j.melnyk
