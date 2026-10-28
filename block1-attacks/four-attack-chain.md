@@ -1,7 +1,7 @@
 ## Block 1 — Active Directory Credential Attack Chain
 *Kerberoasting → AS-REP Roasting → DCSync → LSASS Credential Dumping*
 
-Lab: corpnet.local (isolated VMnet2, 192.168.100.0/24) Environment: DC01 (Domain Controller) · KALI-ATK (attacker) · SENSOR (Suricata) · VICTIM (Metasploitable2) Objective: Enumerate and exploit four distinct Active Directory credential-harvesting vectors, using recon output to justify each attack choice rather than running exploits blindly.
+Lab: corpnet.local (isolated VMnet2, 192.168.100.0/24) Environment: DC01 (Domain Controller) · KALI-ATK (attacker) · SENSOR (Suricata) · VICTIM (WIN_WORKSTATION) Objective: Enumerate and exploit four distinct Active Directory credential-harvesting vectors, using recon output to justify each attack choice rather than running exploits blindly.
 
 ### Overwiev
 

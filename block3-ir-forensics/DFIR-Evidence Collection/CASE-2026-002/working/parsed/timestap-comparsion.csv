@@ -1,5 +1,0 @@
-Timestamp_Original,Timezone_Original,Timestamp_UTC,Source,Event_ID_or_Type,Source_IP,Destination_IP,Account_or_Service,Evidence_File,Notes
-2026-10-25T09:37:51,+02:00,2026-10-25 07:35:51,PCAP,Kerberos AES-REQ (10),192.168.100.20,192.168.100.1,j.melnyk,asreproasting-working.pcap,Запит AES-REQ від клієнта до DC01
-2026-10-25 09:37:51,+02:00,2026-10-25 07:37:51,PCAP,Kerberos AES-REP (11),192.168.100.20,192.168.100.1,j.melnyk,asreproasting-working.pcap,Відповідь AES-REP від клієнта до DC01
-2026-10-25 09:37:51,+02:00,2026-10-25 07:37:51,DC01 Security,Event ID 4768,192.168.100.20,192.168.100.1,j.melnyk,DC01-Security.evtx,Запис про запит сервісного квитка
-2026-10-25 09:37:52,+02:00,2026-10-25 07:37:52,Wazuh,Rule 100203,192.168.100.20,192.168.100.1,j.melnyk,alerts.json,Спрацювання правила AS-REP Roasting 

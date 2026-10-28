@@ -1,0 +1,5 @@
+Timestamp_Original,Timezone_Original,Timestamp_UTC,Source,Event_ID_or_Type,Source_IP,Destination_IP,Account_or_Service,Evidence_File,Notes
+2026-10-25 07:37:51,+02:00,2026-10-25 09:38:53,PCAP,DRSUAPI / DSBind Request,192.168.100.20,192.168.100.1,svc-monitor,asreproasting-working.pcap,Системний запит клієнта до DC01
+2026-10-25 07:37:51,+02:00,2026-10-25 09:38:53,PCAP,DRSUAPI / DSBind Response,192.168.100.1,192.168.100.20,svc-monitor,asreproasting-working.pcap,Відповідь DC01 клієнту
+2026-10-25 07:38:53,+02:00,2026-10-25 09:38:53,DC01 Security,Event ID 4662,192.168.100.20,192.168.100.1,svc-monitor,DC01-Security.evtx,Запис про запит сервісного квитка
+2026-10-25 07:38:55,+02:00,2026-10-25 09:38:55,Wazuh,Rule 100204,192.168.100.20,192.168.100.1,svc-monitor,alerts.json,Спрацювання правила DCSync

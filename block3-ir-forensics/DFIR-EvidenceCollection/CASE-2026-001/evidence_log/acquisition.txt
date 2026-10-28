@@ -1,0 +1,67 @@
+CASE: CASE-2026-001
+
+Evidence ID: E001-01
+Source: DC01 / Windows Security
+Collector: wevtutil
+Artifact: DC01-Security.evtx
+Original Path: Windows Security Event Log
+Acquisition time: 2026-10-25 09:40:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-001/evidence/windows_logs/
+Collected By: Niko Lazur
+SHA-256: 7fd8ae792084b5c53d1e38da4b304aa11082c6dc49ddb8f91f491973d06bd721
+Description: Kerberos service ticket events collected from DC01 during the Kerberoasting investigation.
+
+Evidence ID: E001-02
+Source: SENSOR / SURICATA
+Collector: cp
+Artifact: eve.json
+Original Path: /var/log/suricata/eve.json
+Acquisition time: 2026-10-25 09:41:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-002/evidence/SURICATA/
+Collected By: Niko Lazur
+SHA-256: a36f2ed0d505f2d921debb94edee4de3f3401b23e0aa2a65e3fc5cc52735afe4
+Description: Kerberos service ticket events collected from DC01 during the Kerberoasting investigation.
+
+Evidence ID: E001-03
+Source: Wazuh Manager
+Collector: grep
+Artifact: event-4769-archives.json
+Original Path: /var/ossec/logs/archives/archives.json
+Acquisition Time: 2026-10-25 09:43:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-001/evidence/WAZUH/
+Collected By: Niko Lazur
+SHA-256: e87092a714273939dcfe035660df9d303038eb8c8eeaa1dfa3e719e83a220fe8
+Description: Wazuh alert subset containing references to Event ID 
+
+Evidence ID: E001-04
+Source: Wazuh Manager
+Collector: grep
+Artifact: event-4769-alerts.json
+Original Path: /var/ossec/logs/alerts/alerts.json
+Acquisition Time: 2026-10-25 09:43:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-001/evidence/WAZUH/
+Collected By: Niko Lazur
+SHA-256: 42cc8a5b98945333d98730ffcb84fe444d4a4706c6d7f128aec63ca6638a9a95
+Description: Wazuh alert subset containing references to Event ID 4769
+
+Evidence ID: E001-05
+Source: SENSOR / tcpdump
+Collector: tcpdump
+Artifact: kerberoasting.pcap
+Original path: /home/sensor/
+Acquisition time: 2026-10-25 09:39:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-001/evidence/pcaps/
+Collected by: Niko Lazur
+SHA-256: 33ce952c7d73db7e967f30427018e3fe85c67c3d449851df6c4a4514344c7a95
+Description: Network packet capture collected for investigation of suspected Kerberoasting activity.
+
+Evidence ID: E001-06
+Source: KALI
+Collector: impacket
+Artifact: krb_hashes.txt
+Original path: /home/hunter/
+Acquisition time: 2026-10-25 09:39:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-001/evidence/collected_files/
+Collected by: Niko Lazur
+SHA-256: 672eb444a0afe6687fefe912fda43d240fcce7cd99406e81430f3ad1f7d42c97
+Description: Kerberos TGS hash extracted during kerberoasting
