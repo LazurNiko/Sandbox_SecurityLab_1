@@ -1,4 +1,8 @@
+# 🛡️ Active Directory Attack & Defense Home Lab
+A self-built, isolated home lab documenting a full Attack → Detect → Respond cycle against an Active Directory environment. Every write-up is based on real lab execution — no external platforms (TryHackMe, HackTheBox), no copy-pasted walkthroughs.
+
 ## Lab Architecture
+
 ```mermaid
 flowchart LR
 
@@ -6,11 +10,11 @@ flowchart LR
 
         DC01["DC01\n192.168.100.1\nWindows Server 2019\nDomain Controller\ncorpnet.local"]
 
-        KALI["KALI-ATK\n192.168.100.20\nKali Linux 2024\nAttacker"]
+        KALI["KALI-ATK\n192.168.100.20\nKali Linux 2026\nAttacker"]
 
         SENSOR["SENSOR\n192.168.100.10\nUbuntu 22.04\nSuricata · Zeek\nWazuh · DFIR"]
 
-        VICTIM["VICTIM\n192.168.100.100\nWIN_WORKSTATION\nTarget Host"]
+        VICTIM["VICTIM\n192.168.100.100\nWindows Server 2019\nTarget Host"]
 
     end
 
@@ -28,7 +32,7 @@ flowchart LR
 | DC01 | Windows Server 2019 |192.168.100.1  | Domain Controller (corpnet.local) |
 | KALI-ATK | Kali Linux 2026 | 192.168.100.20 | Attacker | 
 | SENSOR | Ubuntu 22.04 | 192.168.100.10 | IDS / SIEM / IR Platform |
-| VICTIM | WIN_WORKSTATION | 192.168.100.100 | Target Host (Local Admin)
+| VICTIM | Windows Server 2019 | 192.168.100.100 | Target Host (Local Admin)
 
 Host machine: *ThinkPad with Windows installed ·* VMware Workstation Domain: corpnet.local · Network: VMnet2 (host-only, fully isolated, no NAT)
 
@@ -74,8 +78,8 @@ Detection → Analysis → Containment → Eradication → Recovery → Post-Inc
 
 | Phase | Actions Performed | 
 |---|---|
-| Detection | Suricata + Wazuh correlation, TheHive case opened |
-| Analysis | Disk imaging (dcfldd), memory forensics (Winpmem + Volatility3), AD log parsing (Event 4662/4768/4769), PCAP analysis (Zeek) |
+| Detection | Suricata + Wazuh correlation |
+| Analysis | Disk imaging (dcfldd), memory forensics (Winpmem + Volatility3), AD log parsing (Event 4662/4768/4769), PCAP analysis (Suricata) |
 | Containment | Network isolation, svc-monitor account disabled |
 | Eradication | Dangerous ACE removed (dsacls), krbtgt rotated ×2, passwords reset |
 | Recovery | DC01 restored from clean snapshot, detections re-verified |

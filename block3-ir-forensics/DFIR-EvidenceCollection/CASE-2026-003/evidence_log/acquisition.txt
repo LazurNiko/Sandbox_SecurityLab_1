@@ -1,0 +1,56 @@
+CASE: CASE-2026-003
+
+Evidence ID: E003-01
+Source: DC01 / Windows Security
+Collector: wevtutil
+Artifact: DC01-Security.evtx
+Original Path: Windows Security Event Log
+Acquisition time: 2026-10-25 09:50:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-003/evidence/windows_logs/
+Collected By: Niko Lazur
+SHA-256: 7fd8ae792084b5c53d1e38da4b304aa11082c6dc49ddb8f91f491973d06bd721
+Description: Kerberos service ticket events collected from DC01 during the DCSync investigation.
+
+Evidence ID: E003-02
+Source: SENSOR / Wazuh Manager
+Collector: grep
+Artifact: rule-100204-alerts.json
+Original Path: /var/log/suricata/alerts/alerts.json
+Acquisition time: 2026-10-25 09:42:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-002/evidence/WAZUH/
+Collected By: Niko Lazur
+SHA-256: aba1b26eef18f4765125ad85108563dec9dd6e2f5fe3fb47b06c35266922c08c
+Description: Wazuh alert subset containing references to Event ID 4662.
+
+Evidence ID: E003-03
+Source: SENSOR / Wazuh Manager
+Collector: grep
+Artifact: rule-100204-archives.json
+Original Path: /var/ossec/logs/archives/archives.json
+Acquisition Time: 2026-10-25 09:42:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-003/evidence/WAZUH/
+Collected By: Niko Lazur
+SHA-256: 1359276e3836928c399bae94d7b7cdbc816afdd7dad643c6d182f31b625f71c8
+Description: Wazuh archives subset containing references to Event ID 4662
+
+Evidence ID: E003-04
+Source: SENSOR / SURICATA
+Collector: cp
+Artifact: eve.json
+Original Path: /var/log/suricata/
+Acquisition time: 2026-10-25 09:41:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-003/evidence/SURICATA/
+Collected By: Niko Lazur
+SHA-256: a36f2ed0d505f2d921debb94edee4de3f3401b23e0aa2a65e3fc5cc52735afe4
+Description: Suricata alert subset containing references during the DCSync investigation.
+
+Evidence ID: E003-05
+Source: SENSOR / tcpdump
+Collector: tcpdump
+Artifact: dcsync.pcap
+Original path: /home/sensor/
+Acquisition time: 2026-10-25 09:40:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-003/evidence/pcaps/
+Collected by: Niko Lazur
+SHA-256: 91ab6669df4b61f40719a0ea704a911d47914843c14a589176a78fa8aa0b728f
+Description: Network packet capture collected for investigation of suspected DCSync activity.

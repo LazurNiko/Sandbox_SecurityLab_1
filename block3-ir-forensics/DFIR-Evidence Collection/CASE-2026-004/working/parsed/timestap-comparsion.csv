@@ -1,4 +1,0 @@
-Timestamp_Original,Timezone_Original,Timestamp_UTC,Source,Event_ID_or_Type,Source_IP,Destination_IP,Account_or_Service,Evidence_File,Notes
-2026-10-28 05:38:14,+02:00,2026-10-26 07:38:14,Workstation Security,Logon /Event ID 4624,192.168.100.20,192.168.100.100,Steve,DC01-Workstation-Security.evtx,Запис про успішний логін з Attacker IP
-2026-10-25 05:44:49,+02:00,2026-10-26 07:44:49,Workstation Security,Process Creation /Event ID 4688 / lsass.exe,192.168.100.20,192.168.100.100,Steve,DC01-Workstation-Security.evtx,Запис про запуск процесу lsass
-2026-10-28 05:44:50,+02:00,2026-10-26 07:44:50,Wazuh,Rule 100205,192.168.100.20,192.168.100.1,Steve,alerts.json,Спрацювання правила Lsass Credential dumping 

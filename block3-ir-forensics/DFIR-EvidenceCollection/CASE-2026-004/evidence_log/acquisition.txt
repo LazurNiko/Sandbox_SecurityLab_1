@@ -1,0 +1,101 @@
+CASE: CASE-2026-004
+
+Evidence ID: E004-01
+Source: DC01 / Sysmon
+Collector: wevtutil
+Artifact: DC01-Sysmon-Operational.evtx
+Original Path: Microsoft-Windows-Sysmon/Operational
+Acquisition time: 2026-10-28 07:50:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-004/evidence/windows_logs/
+Collected By: Niko Lazur
+SHA-256: 8f32ede83d84aed4d030666df5cd0eee73df0581118da04f41804150230a069e
+Description: Sysmon Operational event log containing Event ID 11, recording creation of C:\lsass.dmp
+
+Evidence ID: E004-02
+Source: DC01 / Windows Security
+Collector: wevtutil
+Artifact: DC01-Workstation-Security.evtx
+Original Path: Windows Security Event Log
+Acquisition time: 2026-10-25 09:50:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-004/evidence/windows_logs/
+Collected By: Niko Lazur
+SHA-256: 4c8e802a3f296ff38ccb04cd5963339d8e8a37682d7e4fde62e24eb5f6358385
+Description: Windows Security event containing relevant to the LSASS dumping investigation, including Event ID 4624
+
+Evidence ID: E004-03
+Source: SENSOR / Wazuh Manager
+Collector: cp
+Artifact: alerts.json
+Original Path: /var/ossec/logs/alerts/alerts.json
+Acquisition time: 2026-10-28 07:51:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-004/evidence/WAZUH/
+Collected By: Niko Lazur
+SHA-256: 7d179eceab85adde6ef96cca9ddef3cea3da0e74f98c25a3b92cda070323d2d1
+Description: Wazuh alert containing references to Sysmon Event Event ID 11.
+
+Evidence ID: E004-04
+Source: SENSOR / Wazuh Manager
+Collector: cp
+Artifact: archives.json
+Original Path: /var/ossec/logs/alerts/alerts.json
+Acquisition time: 2026-10-28 07:51:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-004/evidence/WAZUH/
+Collected By: Niko Lazur
+SHA-256: 43fe158979a09d4fcfe73107818383d78268e831a52184b81e96df8c29d0e302
+Description: Wazuh archives.json containing references to Sysmon Event Event ID 11.
+
+Evidence ID: E004-05
+Source: Derived from Wazuh alerts.json
+Collector: grep / filtering script
+Artifact: alert_100205rule.json
+Original Path: /var/ossec/logs/archives/archives.json
+Acquisition Time: 2026-10-28 07:53:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-004/working/parsed/
+Collected By: Niko Lazur
+SHA-256: 9e3c866772825a00d8c808d0baabe7190d142784f2711baa6df39197b406c4ef
+Description: Filtered Wazuh alerts relevant to LSASS dumping, including rule ID 100205 where present
+
+Evidence ID: E004-06
+Source: Derived from Wazuh alerts.json
+Collector: grep / filtering script
+Artifact: archives-lsass.json
+Original Path: /var/ossec/logs/archives/archives.json
+Acquisition Time: 2026-10-28 07:53:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-004/working/parsed/
+Collected By: Niko Lazur
+SHA-256: f94ec9627922c3fe1bf037cdf5599de9f0e28006c443317f433107d60405afe9
+Description: Filtered Wazuh archived events relevant to LSASS dumping investigation
+
+Evidence ID: E004-07
+Source: SENSOR / SURICATA
+Collector: cp
+Artifact: eve.json
+Original Path: /var/log/suricata/
+Acquisition time: 2026-10-28 07:54:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-003/evidence/SURICATA/
+Collected By: Niko Lazur
+SHA-256: b3d253e9fe3635b2bc829a9b65b964cfc85e13be5e5c4e577be3387f3b1935ac
+Description: Suricata EVE JSON log collected for the LSASS dumping investigation. No events directly associated were identified during the initial review
+
+Evidence ID: E004-08
+Source: SENSOR / SURICATA
+Collector: cp
+Artifact: fast.log
+Original Path: /var/log/suricata/
+Acquisition time: 2026-10-28 07:54:15 EET (UTC+2)
+Destination: /forensics/CASE-2026-003/evidence/SURICATA/
+Collected By: Niko Lazur
+SHA-256: 15758594b647942b3ff2e7a90fb49ce6904fc1b05ab73a87e6640075beee8b1a
+Description: Suricata alert log collected for the LSASS dumping investigation. No events directly associated were identified during the initial review
+
+Evidence ID: E004-09
+Source: SENSOR / tcpdump
+Collector: tcpdump
+Artifact: lsassA.pcap
+Original path: /home/sensor/
+Acquisition time: 2026-10-28 07:55:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-003/evidence/pcaps/
+Collected by: Niko Lazur
+SHA-256: 312599d4b33f553dc6cbd9d16213b4ceb272ce65dbf382ffb0711ba098f5d44d
+Description: Network packet capture collected for investigation of suspected LSASS dumping activity.
+
