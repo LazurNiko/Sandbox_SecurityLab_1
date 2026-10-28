@@ -516,3 +516,17 @@ The forensic workspace provides three important controls:
 For the AD attack-chain laboratory, this distinction is particularly important because the attacks produce different forensic artifacts. Kerberoasting, AS-REP Roasting, and DCSync primarily generate network/directory-service evidence, whereas LSASS dumping generates host-side process and memory artifacts.
 
 The resulting structure provides a consistent foundation for collecting, preserving, analyzing, and reporting DFIR evidence.
+
+# Analyzis
+### Kerberoasting
+Copy pcap file from /forensics/CASE-2026-001/evidence/pcaps to /forensics/CASE-2026-001//working/extracted and analyze with tshark copied file
+
+*/forensics/CASE-2026-001/output/parsed*
+```powershell
+"D:\Progs\Wireshark\tshark.exe" -r "D:\Progects\Sandbox_SecurityLab_1\block3-ir-forensics\DFIR Evidence Collection\CASE-2026-001\working\extracted\block2-kerberoasting-working.pcap" -Y "kerberos.msg_type == 12" -T fields -E header=y -E separator="|" -E quote=d -e frame.time -e ip.src -e ip.dst -e kerberos.CNameString -e kerberos.SNameString | Out-File "kerberoasting-tgsreq.txt"
+
+ & "D:\Progs\Wireshark\tshark.exe" -r "D:\Progects\Sandbox_SecurityLab_1\block3-ir-forensics\DFIR Evidence Collection\CASE-2026-001\working\extracted\block2-kerberoasting-working.pcap" -Y "kerberos.msg_type == 13" -T fields -E header=y -E separator="|" -E quote=d -e frame.time -e ip.src -e ip.dst -e kerberos.CNameString -e kerberos.SNameString | Out-File "kerberoasting-tgsrep.txt"
+
+ & "D:\Progs\Wireshark\tshark.exe" -r "D:\Progects\Sandbox_SecurityLab_1\block3-ir-forensics\DFIR Evidence Collection\CASE-2026-001\working\extracted\block2-kerberoasting-working.pcap" -Y "kerberos.msg_type == 13" -V | Out-File "\block3-ir-forensics\DFIR Evidence Collection\CASE-2026-001\output\parsed\kerberosting-tgsrep-details.txt
+ ```
+ 

@@ -1,0 +1,12 @@
+CASE: CASE-2026-004
+
+Evidence ID: E004-01
+Source: DC01 / Sysmon
+Collector: wevtutil
+Artifact: DC01-Workstation.evtx
+Original Path: Windows Security Event Log
+Acquisition time: 2026-10-25 06:30:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-004/evidence/windows_logs/
+Collected By: Niko Lazur
+SHA-256: 7fd8ae792084b5c53d1e38da4b304aa11082c6dc49ddb8f91f491973d06bd721
+Description: Kerberos service ticket events collected from DC01 during the DCSync investigation.

@@ -1,0 +1,57 @@
+﻿"10/28/2026 7:44:49 AM","11","Microsoft-Windows-Sysmon","WIN-MT4VSSDMUEM.corpnet.local","File created:
+RuleName: -
+UtcTime: 2026-10-28 05:44:49.399
+ProcessGuid: {9e385a97-8bd1-6ae1-0002-000000000600}
+ProcessId: 4080
+Image: C:\procdump64.exe
+TargetFilename: C:\lsass.exe.dmp
+CreationUtcTime: 2026-10-28 05:44:49.399
+User: WIN-MT4VSSDMUEM\Steve"
+"10/28/2026 7:44:49 AM","1","Microsoft-Windows-Sysmon","WIN-MT4VSSDMUEM.corpnet.local","Process Create:
+RuleName: -
+UtcTime: 2026-10-28 05:44:49.377
+ProcessGuid: {9e385a97-8bd1-6ae1-0002-000000000600}
+ProcessId: 4080
+Image: C:\procdump64.exe
+FileVersion: 12.01
+Description: Sysinternals process dump utility
+Product: ProcDump
+Company: Sysinternals - www.sysinternals.com
+OriginalFileName: procdump
+CommandLine: procdump64.exe  -accepteula -ma 640 C:\lsass.exe 
+CurrentDirectory: C:\
+User: WIN-MT4VSSDMUEM\Steve
+LogonGuid: {9e385a97-83b6-6ae1-0133-130000000000}
+LogonId: 0x133301
+TerminalSessionId: 0
+IntegrityLevel: High
+Hashes: MD5=3C026011A9F2F583D708E7E9737EE976,SHA256=D1FC99AE304BD1D2BF28ABEB62531DA959E2431916194981B88C958FD713A8E6,IMPHASH=2C81CB4630DF5497DC2A5050263610E9
+ParentProcessGuid: {9e385a97-8bd1-6ae1-fe01-000000000600}
+ParentProcessId: 3576
+ParentImage: C:\Windows\System32\cmd.exe
+ParentCommandLine: cmd.exe /Q /c procdump64.exe -accepteula -ma 640 C:\lsass.exe 1> \\127.0.0.1\ADMIN$\__1793164214.1361017 2>&1
+ParentUser: WIN-MT4VSSDMUEM\Steve"
+"10/28/2026 7:44:49 AM","1","Microsoft-Windows-Sysmon","WIN-MT4VSSDMUEM.corpnet.local","Process Create:
+RuleName: -
+UtcTime: 2026-10-28 05:44:49.186
+ProcessGuid: {9e385a97-8bd1-6ae1-fe01-000000000600}
+ProcessId: 3576
+Image: C:\Windows\System32\cmd.exe
+FileVersion: 10.0.20348.1 (WinBuild.160101.0800)
+Description: Windows Command Processor
+Product: Microsoft® Windows® Operating System
+Company: Microsoft Corporation
+OriginalFileName: Cmd.Exe
+CommandLine: cmd.exe /Q /c procdump64.exe -accepteula -ma 640 C:\lsass.exe 1> \\127.0.0.1\ADMIN$\__1793164214.1361017 2>&1
+CurrentDirectory: C:\
+User: WIN-MT4VSSDMUEM\Steve
+LogonGuid: {9e385a97-83b6-6ae1-0133-130000000000}
+LogonId: 0x133301
+TerminalSessionId: 0
+IntegrityLevel: High
+Hashes: MD5=E7A6B1F51EFB405287A8048CFA4690F4,SHA256=EB71EA69DD19F728AB9240565E8C7EFB59821E19E3788E289301E1E74940C208,IMPHASH=D60B77062898DC6BFAE7FE11A0F8806C
+ParentProcessGuid: {9e385a97-8bd1-6ae1-fd01-000000000600}
+ParentProcessId: 3816
+ParentImage: C:\Windows\System32\wbem\WmiPrvSE.exe
+ParentCommandLine: C:\Windows\system32\wbem\wmiprvse.exe -secured -Embedding
+ParentUser: NT AUTHORITY\NETWORK SERVICE"
