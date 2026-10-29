@@ -22,7 +22,7 @@ Collected By: Niko Lazur
 SHA-256: a36f2ed0d505f2d921debb94edee4de3f3401b23e0aa2a65e3fc5cc52735afe4
 Description: Suricata event log collected for investigation. No dedicated AS-REP Roasting detection rule was configured, therefore no Suricata alert for AS-REP Roasting was expected or identified.
 
-Evidence ID: E-002-03
+Evidence ID: E002-03
 Source: Wazuh Manager
 Collector: grep
 Artifact: event-4768-archives.json
@@ -33,7 +33,7 @@ Collected By: Niko Lazur
 SHA-256: af741d93c86a4b012ba4cdde4ca0a486019461aab64a9b636bbfdbb7464c5b1d
 Description: Wazuh alert subset containing references to Event ID 4769
 
-Evidence ID: E-002-04
+Evidence ID: E002-04
 Source: Wazuh Manager
 Collector: grep
 Artifact: asrep-alerts.json
@@ -44,7 +44,7 @@ Collected By: Niko Lazur
 SHA-256: 0fc6b05e0d7a901a6165740f31d5c336c5a768280a49c40d5a2f46d8404df199
 Description: Wazuh alert subset containing references to Event ID 4769
 
-Evidence ID: E-002-05
+Evidence ID: E002-05
 Source: SENSOR / tcpdump
 Collector: tcpdump
 Artifact: asreproasting.pcap
@@ -54,3 +54,14 @@ Destination: /forensics/CASE-2026-001/evidence/pcaps/
 Collected by: Niko Lazur
 SHA-256: 572a1679c4845f5fd449f5b98a229603609d27562717d8a5cf4571df8d6487df
 Description: Network packet capture collected for investigation of suspected AS-REP Roasting activity.
+
+Evidence ID: E002-06
+Source: KALI
+Collector: impacket
+Artifact: asrep_hashes.txt
+Original path: /home/hunter/
+Acquisition time: 2026-10-25 09:39:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-002/evidence/collected_files/
+Collected by: Niko Lazur
+SHA-256: 5fdf11dd7dde71f7974682c1df8ff65ba71fe29f9ed123861f460da52f8f630f
+Description: Kerberos TGS hash extracted during kerberoasting

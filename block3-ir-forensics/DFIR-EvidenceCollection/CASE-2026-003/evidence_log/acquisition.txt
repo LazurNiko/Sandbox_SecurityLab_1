@@ -54,3 +54,14 @@ Destination: /forensics/CASE-2026-003/evidence/pcaps/
 Collected by: Niko Lazur
 SHA-256: 91ab6669df4b61f40719a0ea704a911d47914843c14a589176a78fa8aa0b728f
 Description: Network packet capture collected for investigation of suspected DCSync activity.
+
+Evidence ID: E003-06
+Source: KALI
+Collector: impacket
+Artifact: secretsdump.txt
+Original path: /home/hunter/
+Acquisition time: 2026-10-25 09:39:00 EET (UTC+2)
+Destination: /forensics/CASE-2026-003/evidence/collected_files/
+Collected by: Niko Lazur
+SHA-256: 4105186159e4c56e8836c364ed970ee44316118f8d31690c0ac3910c04196048
+Description: Kerberos TGS hash extracted during kerberoasting
