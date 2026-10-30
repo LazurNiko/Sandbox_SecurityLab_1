@@ -1,1 +1,26 @@
 IOC_ID,Case_ID,IOC_Type,IOC_Value,First_Seen,Last_Seen,Source,Evidence_ID,Confidence,Context,Validation_Status,Notes
+IOC-004-001,CASE-2026-004,IPv4,192.168.100.20,2026-10-28T05:09:19.000Z,2026-10-28T06:02:23.707Z,Suricata
+IOC-004-002,CASE-2026-004,Account,WIN-MT4VSSDMUEM\Steve,2026-10-28T05:09:35.384Z,2026-10-28T06:02:23.163Z,Security
+IOC-004-003,CASE-2026-004,Affected_Host,WIN-MT4VSSDMUEM.corpnet.local (192.168.100.100),2026-10-28T05:10:14.171Z,2026-10-28T06:02:23.707Z,Sysmon
+IOC-004-004,CASE-2026-004,Logon_ID,0x133301,2026-10-28T05:10:14.361Z,2026-10-28T05:50:25.213Z,Security
+IOC-004-005,CASE-2026-004,Command_Line,cmd.exe /Q /c <command> 1> \\127.0.0.1\ADMIN$\__<epoch>.<frac> 2>&1 (parent WmiPrvSE.exe -secured -Embedding),2026-10-28T05:10:14.745Z,2026-10-28T06:02:23.163Z,Sysmon
+IOC-004-006,CASE-2026-004,File_Path,C:\Windows\__1793164214.1361017,2026-10-28T05:10:14.745Z,2026-10-28T05:50:25.213Z,Sysmon,E004-01,Medium,"wmiexec output file, session 1 (epoch 1793164214 = 05:10:14 UTC)",Inferred,"Seen only in command lines
+IOC-004-007,CASE-2026-004,File_Path,C:\Windows\__1793166990.8948607,2026-10-28T05:56:31.669Z,2026-10-28T06:02:23.163Z,Sysmon,E004-01,Medium,"wmiexec output file, session 2 (epoch 1793166990 = 05:56:30 UTC)",Inferred,Seen only in command lines
+IOC-004-008,CASE-2026-004,Process_Chain,WmiPrvSE.exe -> cmd.exe -> procdump64.exe,2026-10-28T05:11:10.154Z,2026-10-28T06:01:30.745Z,Sysmon,E004-01,High,Remote execution of ProcDump against LSASS via WMI,Confirmed,7 executions
+IOC-004-009,CASE-2026-004,Command_Line,procdump64.exe -accepteula -ma 640 C:\lsass.exe,2026-10-28T05:12:08.757Z,2026-10-28T05:50:25.318Z,Sysmon,E004-01,High,"LSASS full-memory dump, dumps #1-#5",Confirmed,"Executions at 05:12:08, 05:16:16, 05:44:49, 05:45:59, 05:50:25. PID 640 assumed to be lsass.exe from preceding tasklist | findstr (output not captured). Rule 100205 silent for the first two"
+IOC-004-010,CASE-2026-004,Command_Line,procdump64.exe -accepteula -ma 640 C:\lsass.dmp,2026-10-28T06:01:30.745Z,2026-10-28T06:01:30.745Z,Sysmon,E004-01,High,"LSASS dump #6, session 2",Confirmed,"Written as C:\lsass-2.dmp (name collision, inferred)"
+IOC-004-011,CASE-2026-004,File_Path,C:\procdump64.exe,2026-10-28T05:11:10.285Z,2026-10-28T06:01:30.745Z,Sysmon,E004-01,Medium,Dual-use Sysinternals tool in unusual location (drive root)
+IOC-004-012,CASE-2026-004,File_Hash_SHA256,D1FC99AE304BD1D2BF28ABEB62531DA959E2431916194981B88C958FD713A8E6,2026-10-28T05:12:08.757Z,2026-10-28T06:01:30.745Z,Sysmon,E004-01,Low,Hash of executed procdump64.exe (identical in both sessions),Confirmed,"MD5 3C026011A9F2F583D708E7E9737EE976
+IOC-004-013,CASE-2026-004,File_Path,C:\lsass.exe.dmp,2026-10-28T05:12:08.782Z,2026-10-28T05:50:25.340Z,Sysmon,E004-01,High,"ProcDump output, overwritten by dumps #1-#5 (Sysmon 11 each time)",Confirmed,Misleading name (has .exe.dmp)
+IOC-004-014,CASE-2026-004,File_Path,C:\lsass-2.dmp,2026-10-28T06:01:30.775Z,2026-10-28T06:01:30.775Z,Sysmon,E004-01,High,"ProcDump output, dump #6",Confirmed,
+IOC-004-015,CASE-2026-004,File_Path,C:\lsass.dmp,2026-10-28T06:00:59.218Z,2026-10-28T06:02:23.163Z,Sysmon,E004-01,Medium,File inspected with certutil -dump and sent with ncat,Inferred,Creation not logged by Sysmon 11 (a rename would not be)
+IOC-004-016,CASE-2026-004,File_Hash_SHA256,ce35f07636c69f746d7613f303841b8ef20311c1df7fa62d72b8a19b96f46f86,,,sha256sums.txt,UNREGISTERED,Medium,"Collected lsass.dmp (46,818 B, MDMP header)",Unverified,"Not listed as its own item in acquisition.txt. Link to exfiltrated C:\lsass.dmp inferred from size (flow 49,278 B). Credential content not analyzed (run pypykatz)"
+IOC-004-017,CASE-2026-004,File_Path,C:\ncat.exe,2026-10-28T05:59:44.589Z,2026-10-28T06:02:23.645Z,Sysmon,E004-01,High,Netcat downloaded via curl from attacker server and used for exfiltration,Confirmed,
+IOC-004-018,CASE-2026-004,File_Hash_SHA256,35C8EA5C1A427FF146CEB1281BEFE9200A406063302C3E1BDF30B65ECD0E39F7,2026-10-28T06:02:23.645Z,2026-10-28T06:02:23.645Z,Sysmon,E004-01,High,Hash of executed ncat.exe,Confirmed,MD5 58DE45BB66F9BB9AF5A8499F211640D7
+IOC-004-019,CASE-2026-004,URL,http://192.168.100.20:8000/procdump64.exe,2026-10-28T05:59:43.462Z,2026-10-28T05:59:43.462Z,Sysmon
+IOC-004-020,CASE-2026-004,URL,http://192.168.100.20:8000/ncat.exe,2026-10-28T05:59:44.240Z,2026-10-28T05:59:44.240Z,Sysmon
+IOC-004-021,CASE-2026-004,Network_Connection,192.168.100.100 -> 192.168.100.20:9000/tcp,2026-10-28T06:02:23.571Z,2026-10-28T06:02:23.707Z,Suricata,E004-07,High,Exfiltration of C:\lsass.dmp with ncat,Confirmed,"Flow: 49,278 B to server, 1,266 B to client. Payload content not captured
+IOC-004-022,CASE-2026-004,Network_Connection,192.168.100.20 -> 192.168.100.100:49667/tcp,2026-10-28T05:10:14.000Z,2026-10-28T06:02:23.000Z,Suricata,E004-07
+IOC-004-023,CASE-2026-004,Network_Connection,192.168.100.20 -> 192.168.100.100:445/tcp (NTLM),2026-10-28T05:44:49.000Z,2026-10-28T05:56:30.000Z,Suricata
+IOC-004-024,CASE-2026-004,Network_Connection,192.168.100.20 -> 192.168.100.1:445/tcp (NTLM),2026-10-28T05:09:19.000Z,2026-10-28T05:09:19.000Z,Suricata
+IOC-004-025,CASE-2026-004,Account,"Administrator (explicit credentials, 4648 from 127.0.0.1)",2026-10-28T05:14:17.071Z,2026-10-28T05:14:17.293Z,Security,E004-02,Low,"Two 4648 events with machine account as subject, not linked to any wmiexec command",Unverified,Cause not determined

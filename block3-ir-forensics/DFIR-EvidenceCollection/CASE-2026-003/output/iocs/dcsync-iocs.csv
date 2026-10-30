@@ -1,10 +1,10 @@
 IOC_ID,Case_ID,IOC_Type,IOC_Value,First_Seen,Last_Seen,Source,Evidence_ID,Confidence,Context,Validation_Status,Notes
-IOC-2026-003-001,CASE-2026-003,account,Administrator:500:aad3b435b51404eeaad3b435b51404ee:7aeb7347bd6b0b04dbbf2cc71353293f,2026-10-25 09:37:51,2026-10-25 09:38:55,secretsdump.txt,E003-(01-05),High,NT hash exposed,Validated,reset password
-IOC-2026-003-002,CASE-2026-003,account,krbtgt:502:aad3b435b51404eeaad3b435b51404ee:d1d0b36d6e6818268b8f0ce86b242be9,2026-10-25 09:37:51,2026-10-25 09:38:55,secretsdump.txt,E003-(01-05),High,NT hash exposed via DCSync,Validated,rotate twice
-IOC-2026-003-003,CASE-2026-003,account,svc-backup:1103:aad3b435b51404eeaad3b435b51404ee:72f0eefcc213ea8f350773b831cf2c9c,2026-10-25 09:37:51,2026-10-25 09:38:55,secretsdump.txt,E003-(01-05),High,NT hash exposed,Validated,reset password
-IOC-2026-003-004,CASE-2026-003,account,j.melnyk:1104:aad3b435b51404eeaad3b435b51404ee:59fc0f884922b4ce376051134c71e22c,2026-10-25 09:37:51,2026-10-25 09:38:55,secretsdump.txt,E003-(01-05),High,NT hash exposed,Validated,reset password
-IOC-2026-003-005,CASE-2026-003,account,svc-monitor:1105:aad3b435b51404eeaad3b435b51404ee:47f3f50b2ca90b6efafca50c70fd9461,2026-10-25 09:37:51,2026-10-25 09:38:55,secretsdump.txt,E003-(01-05),High,NT hash exposed,Validated,reset password
-IOC-2026-003-006,CASE-2026-003,account,DC01$:1000:aad3b435b51404eeaad3b435b51404ee:16e67fbc7c4bb4640e68bcdee64da071,2026-10-25 09:37:51,2026-10-25 09:38:55,secretsdump.txt,E003-(01-05),High,NT hash exposed,Validated,reset machine password
+IOC-2026-003-001,CASE-2026-003,account,Administrator:500:aad3b435b.....c71353293f,2026-10-25 09:37:51,2026-10-25 09:38:55,secretsdump.txt,E003-(01-05),High,NT hash exposed,Validated,reset password
+IOC-2026-003-002,CASE-2026-003,account,krbtgt:502:aad3b435b5140.....242be9,2026-10-25 09:37:51,2026-10-25 09:38:55,secretsdump.txt,E003-(01-05),High,NT hash exposed via DCSync,Validated,rotate twice
+IOC-2026-003-003,CASE-2026-003,account,svc-backup:1103:aad3b435.....3b831cf2c9c,2026-10-25 09:37:51,2026-10-25 09:38:55,secretsdump.txt,E003-(01-05),High,NT hash exposed,Validated,reset password
+IOC-2026-003-004,CASE-2026-003,account,j.melnyk:1104:aad3b435b5.....34c71e22c,2026-10-25 09:37:51,2026-10-25 09:38:55,secretsdump.txt,E003-(01-05),High,NT hash exposed,Validated,reset password
+IOC-2026-003-005,CASE-2026-003,account,svc-monitor:1105:aad3b435.....50c70fd9461,2026-10-25 09:37:51,2026-10-25 09:38:55,secretsdump.txt,E003-(01-05),High,NT hash exposed,Validated,reset password
+IOC-2026-003-006,CASE-2026-003,account,DC01$:1000:aad3b435b51.....e64da071,2026-10-25 09:37:51,2026-10-25 09:38:55,secretsdump.txt,E003-(01-05),High,NT hash exposed,Validated,reset machine password
 IOC-2026-003-007,CASE-2026-003,ipv4,192.168.100.20,2026-10-25 09:37:51,2026-10-25 09:38:55,dcsync.pcap,E003-05,Medium,Source of DRSUAPI replication,Validated,isolate host
 IOC-2026-003-008,CASE-2026-003,network,DRSUAPI DsGetNCChanges from non-DC,2026-10-25 09:37:51,2026-10-25 09:38:55,eve.json,E003-04,Medium,Suricata sid 1000002,Validated,detection
 IOC-2026-003-009,CASE-2026-003,event,4662 GUID 1131f6aa/1131f6ad non-machine subject,2026-10-25 09:37:51,2026-10-25 09:38:55,event-4662-alerts.json,E003-04,Medium,Wazuh rile 100204,Validated,detection

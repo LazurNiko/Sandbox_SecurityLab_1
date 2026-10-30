@@ -1,4 +1,4 @@
-# 🛡️ Active Directory Attack & Defense Home Lab
+# Active Directory Attack & Defense Home Lab
 A self-built, isolated home lab documenting a full Attack → Detect → Respond cycle against an Active Directory environment. Every write-up is based on real lab execution — no external platforms (TryHackMe, HackTheBox), no copy-pasted walkthroughs.
 
 ## Lab Architecture
@@ -63,7 +63,7 @@ Each attack from Block 1 detected using Suricata network signatures and Wazuh ho
 | Kerberoasting | Suricata · Wazuh (Event 4769) | RC4 (etype 0x17) TGS-REQ burst |
 | AS-REP Roasting | Suricata · Wazuh (Event 4768) | AS-REQ missing |PA-ENC-TIMESTAMP |
 | DCSync| Suricata | DRSUAPI GetNCChanges from non-DC host |
-| LSASS Dumping | Wazuh · Sysmon (Event ID 10) | Process handle opened on lsass.exe |
+| LSASS Dumping | Wazuh · Sysmon (Event ID 1/11) | Process handle opened on lsass.exe |
 
 
 Tools: Suricata · Zeek · Wazuh · tshark · python-evtx
@@ -88,7 +88,6 @@ Detection → Analysis → Containment → Eradication → Recovery → Post-Inc
 Tools: dcfldd · Winpmem · Volatility3 · TheHive · Wazuh · Zeek · pypykatz
 
 Scope note: no physical Fortigate appliance in this lab — firewall flow logs are simulated in the documented Fortinet syslog format from real pcap timestamps and explicitly labeled as such.
-
 
 Skills:
 
