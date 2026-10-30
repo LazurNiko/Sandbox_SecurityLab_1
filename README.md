@@ -1,4 +1,4 @@
-# 🛡️ Active Directory Attack & Defense Home Lab
+# Active Directory Attack & Defense Home Lab
 A self-built, isolated home lab documenting a full Attack → Detect → Respond cycle against an Active Directory environment. Every write-up is based on real lab execution — no external platforms (TryHackMe, HackTheBox), no copy-pasted walkthroughs.
 
 ## Lab Architecture
@@ -88,7 +88,6 @@ Detection → Analysis → Containment → Eradication → Recovery → Post-Inc
 Tools: dcfldd · Winpmem · Volatility3 · TheHive · Wazuh · Zeek · pypykatz
 
 Scope note: no physical Fortigate appliance in this lab — firewall flow logs are simulated in the documented Fortinet syslog format from real pcap timestamps and explicitly labeled as such.
-
 
 Skills:
 
