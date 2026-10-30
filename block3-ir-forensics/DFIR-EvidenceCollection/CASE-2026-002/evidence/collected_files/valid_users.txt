@@ -1,6 +1,0 @@
-2026/10/22 04:31:46 >  Using KDC(s):
-2026/10/22 04:31:46 >  	192.168.100.1:88
-2026/10/22 04:31:46 >  [+] VALID USERNAME:	 svc-backup@corpnet.local
-2026/10/22 04:31:46 >  [+] VALID USERNAME:	 Administrator@corpnet.local
-2026/10/22 04:31:46 >  [+] VALID USERNAME:	 j.melnyk@corpnet.local
-2026/10/22 04:31:46 >  Done! Tested 7 usernames (3 valid) in 0.015 seconds

@@ -1,0 +1,83 @@
+```gitignore
+# =========================
+# DFIR EVIDENCE
+# =========================
+
+# Original evidence from all cases
+/block3-ir-forensics/DFIR-EvidenceCollection/CASE-*/evidence/
+
+# Evidence file formats
+*.evtx
+*.pcap
+*.pcapng
+*.raw
+*.dd
+*.E01
+*.001
+*.mem
+*.dmp
+
+# Wazuh raw logs
+alerts.json
+archives.json
+
+# Sensitive collected artifacts
+krb_hashes.txt
+asrep_hashes.txt
+valid_users.txt
+secretsdump.txt
+kerberoast_hashes.txt
+
+# =========================
+# WORKING / PARSED DATA
+# =========================
+
+/block3-ir-forensics/DFIR-EvidenceCollection/CASE-*/working/
+
+# =========================
+# SENSITIVE / LOCAL DATA
+# =========================
+
+.env
+.env.*
+*.key
+*.pem
+*.pfx
+*.p12
+*.crt
+*.kdbx
+
+*password*
+*credential*
+*secret*
+*hashes*
+
+# =========================
+# OS / IDE
+# =========================
+
+.DS_Store
+Thumbs.db
+
+.vscode/
+.idea/
+
+# =========================
+# PYTHON
+# =========================
+
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# =========================
+# TEMPORARY FILES
+# =========================
+
+*.tmp
+*.temp
+*.bak
+*.swp
+*.log
+```
