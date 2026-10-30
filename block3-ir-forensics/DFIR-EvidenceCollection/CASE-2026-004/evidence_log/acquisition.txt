@@ -1,7 +1,7 @@
 CASE: CASE-2026-004
 
 Evidence ID: E004-01
-Source: DC01 / Sysmon
+Source: VICTIM / Sysmon
 Collector: wevtutil
 Artifact: DC01-Sysmon-Operational.evtx
 Original Path: Microsoft-Windows-Sysmon/Operational

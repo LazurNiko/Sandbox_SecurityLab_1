@@ -63,7 +63,7 @@ Each attack from Block 1 detected using Suricata network signatures and Wazuh ho
 | Kerberoasting | Suricata · Wazuh (Event 4769) | RC4 (etype 0x17) TGS-REQ burst |
 | AS-REP Roasting | Suricata · Wazuh (Event 4768) | AS-REQ missing |PA-ENC-TIMESTAMP |
 | DCSync| Suricata | DRSUAPI GetNCChanges from non-DC host |
-| LSASS Dumping | Wazuh · Sysmon (Event ID 10) | Process handle opened on lsass.exe |
+| LSASS Dumping | Wazuh · Sysmon (Event ID 1/11) | Process handle opened on lsass.exe |
 
 
 Tools: Suricata · Zeek · Wazuh · tshark · python-evtx
